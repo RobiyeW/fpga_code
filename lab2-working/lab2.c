@@ -27,7 +27,7 @@ void *cursor_blink_thread(void *);
 
 char keycode_to_ascii(uint8_t keycode, uint8_t modifiers)
 {
-    // Properly indexed keymaps for standard and shifted keys
+    // Corrected keymap based on USB HID scan codes
     static const char keymap[] = {
         0, 0, 0, 0,                                       // Keycodes 0-3 (unused)
         'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', // 4-13
@@ -51,21 +51,64 @@ char keycode_to_ascii(uint8_t keycode, uint8_t modifiers)
         return (modifiers & (USB_LSHIFT | USB_RSHIFT)) ? shift_keymap[keycode] : keymap[keycode];
     }
 
-    // Handle special keys separately
+    // Fix Backspace and other special keys
     switch (keycode)
     {
+    case 0x2A:
+        return '\b'; // 🔹 Backspace now correctly mapped
     case 0x2B:
         return '\t'; // Tab
     case 0x2C:
         return ' '; // Space
     case 0x28:
         return '\n'; // Enter
-    case 0x2A:
-        return '\b'; // Backspace
     default:
         return 0;
     }
 }
+
+//////////////// working code/////////////////
+// char keycode_to_ascii(uint8_t keycode, uint8_t modifiers)
+// {
+//     // Properly indexed keymaps for standard and shifted keys
+//     static const char keymap[] = {
+//         0, 0, 0, 0,                                       // Keycodes 0-3 (unused)
+//         'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', // 4-13
+//         'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', // 14-23
+//         'u', 'v', 'w', 'x', 'y', 'z', '1', '2', '3', '4', // 24-33
+//         '5', '6', '7', '8', '9', '0', '-', '=', '[', ']', // 34-43
+//         '\\', ';', '\'', '`', ',', '.', '/', ' '          // 44-50 (Space at 50)
+//     };
+
+//     static const char shift_keymap[] = {
+//         0, 0, 0, 0,
+//         'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', // 4-13
+//         'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', // 14-23
+//         'U', 'V', 'W', 'X', 'Y', 'Z', '!', '@', '#', '$', // 24-33
+//         '%', '^', '&', '*', '(', ')', '_', '+', '{', '}', // 34-43
+//         '|', ':', '"', '~', '<', '>', '?', ' '            // 44-50 (Space at 50)
+//     };
+
+//     if (keycode >= 4 && keycode <= 50)
+//     {
+//         return (modifiers & (USB_LSHIFT | USB_RSHIFT)) ? shift_keymap[keycode] : keymap[keycode];
+//     }
+
+//     // Handle special keys separately
+//     switch (keycode)
+//     {
+//     case 0x2B:
+//         return '\t'; // Tab
+//     case 0x2C:
+//         return ' '; // Space
+//     case 0x28:
+//         return '\n'; // Enter
+//     case 0x2A:
+//         return '\b'; // Backspace
+//     default:
+//         return 0;
+//     }
+// }
 
 // char keycode_to_ascii(uint8_t keycode, uint8_t modifiers)
 // {
