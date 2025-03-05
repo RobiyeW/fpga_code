@@ -1,23 +1,7 @@
 #include "usbkeyboard.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 
-/* References on libusb 1.0 and the USB HID/keyboard protocol
- *
- * http://libusb.org
- * https://web.archive.org/web/20210302095553/https://www.dreamincode.net/forums/topic/148707-introduction-to-using-libusb-10/
- *
- * https://www.usb.org/sites/default/files/documents/hid1_11.pdf
- *
- * https://usb.org/sites/default/files/hut1_5.pdf
- */
-
-/*
- * Find and return a USB keyboard device or NULL if not found
- * The argument con
- *
- */
 struct libusb_device_handle *openkeyboard(uint8_t *endpoint_address)
 {
     libusb_device **devs;
@@ -26,22 +10,17 @@ struct libusb_device_handle *openkeyboard(uint8_t *endpoint_address)
     ssize_t num_devs, d;
     uint8_t i, k;
 
-    /* Start the library */
     if (libusb_init(NULL) < 0)
     {
         fprintf(stderr, "Error: libusb_init failed\n");
         exit(1);
     }
 
-    /* Enumerate all the attached USB devices */
     if ((num_devs = libusb_get_device_list(NULL, &devs)) < 0)
     {
         fprintf(stderr, "Error: libusb_get_device_list failed\n");
         exit(1);
     }
-
-    /* Look at each device, remembering the first HID device that speaks
-       the keyboard protocol */
 
     for (d = 0; d < num_devs; d++)
     {
@@ -87,6 +66,5 @@ struct libusb_device_handle *openkeyboard(uint8_t *endpoint_address)
 
 found:
     libusb_free_device_list(devs, 1);
-
     return keyboard;
 }
