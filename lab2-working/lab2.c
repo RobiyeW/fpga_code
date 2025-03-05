@@ -46,16 +46,18 @@ char keycode_to_ascii(uint8_t keycode, uint8_t modifiers)
         '|', ':', '"', '~', '<', '>', '?', ' '            // 44-50 (Space at 50)
     };
 
+    // Check if the keycode is in the valid range (4-50)
     if (keycode >= 4 && keycode <= 50)
     {
+        // Return shifted or unshifted character based on modifiers
         return (modifiers & (USB_LSHIFT | USB_RSHIFT)) ? shift_keymap[keycode] : keymap[keycode];
     }
 
-    // Fix Backspace and other special keys
+    // Handle special keys like Backspace, Tab, Space, Enter, etc.
     switch (keycode)
     {
     case 0x2A:
-        return '\b'; // 🔹 Backspace now correctly mapped
+        return '\b'; // Backspace
     case 0x2B:
         return '\t'; // Tab
     case 0x2C:
@@ -63,6 +65,8 @@ char keycode_to_ascii(uint8_t keycode, uint8_t modifiers)
     case 0x28:
         return '\n'; // Enter
     default:
+        // Log the unknown keycode for debugging
+        printf("Unknown keycode: 0x%X\n", keycode);
         return 0;
     }
 }
