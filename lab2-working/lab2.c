@@ -25,39 +25,52 @@ pthread_t network_thread, cursor_thread;
 void *network_thread_f(void *);
 void *cursor_blink_thread(void *);
 
-char keycode_to_ascii(uint8_t keycode, uint8_t modifiers) {
-    const char keymap[] = "1234567890-=\tqwertyuiop[]\nasdfghjkl;'`\\zxcvbnm,./ ";
-    const char shift_keymap[] = "!@#$%^&*()_+\tQWERTYUIOP{}|ASDFGHJKL:\"~|ZXCVBNM<>? ";
+char keycode_to_ascii(uint8_t keycode, uint8_t modifiers)
+{
+    // Standard QWERTY mapping based on USB HID keycodes
+    const char keymap[] = {
+        0, 0, 0, 0, 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
+        'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+        '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '\n', '\b', '\t', ' ', '-', '=',
+        '[', ']', '\\', ';', '\'', '`', ',', '.', '/'};
 
-    if (keycode >= 4 && keycode <= 39) {
-        return (modifiers & (USB_LSHIFT | USB_RSHIFT)) ? shift_keymap[keycode - 4] : keymap[keycode - 4];
-    }
+    const char shift_keymap[] = {
+        0, 0, 0, 0, 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
+        'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+        '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '\n', '\b', '\t', ' ', '_', '+',
+        '{', '}', '|', ':', '"', '~', '<', '>', '?'};
 
-    switch (keycode) {
-        case 0x2B: return '\t'; // Tab
-        case 0x2C: return ' ';  // Space
-        case 0x28: return '\n'; // Enter
-        case 0x2A: return '\b'; // Backspace
-        default: return 0;
-    }
+    // Ensure keycode is within bounds
+    if (keycode < 4 || keycode > 53)
+        return 0;
+
+    // Use shift map if Shift key is held
+    return (modifiers & (USB_LSHIFT | USB_RSHIFT)) ? shift_keymap[keycode - 4] : keymap[keycode - 4];
 }
 
-void *network_thread_f(void *ignored) {
+void *network_thread_f(void *ignored)
+{
     char recvBuf[BUFFER_SIZE];
     int n;
-    while ((n = read(sockfd, recvBuf, BUFFER_SIZE - 1)) > 0) {
+    while ((n = read(sockfd, recvBuf, BUFFER_SIZE - 1)) > 0)
+    {
         recvBuf[n] = '\0';
         display_received_message(recvBuf);
     }
     return NULL;
 }
 
-void *cursor_blink_thread(void *arg) {
+void *cursor_blink_thread(void *arg)
+{
     int blink_state = 1;
-    while (1) {
-        if (blink_state) {
+    while (1)
+    {
+        if (blink_state)
+        {
             draw_cursor(23, 2);
-        } else {
+        }
+        else
+        {
             fbputchar(' ', 23, 2);
         }
         blink_state = !blink_state;
@@ -66,7 +79,8 @@ void *cursor_blink_thread(void *arg) {
     return NULL;
 }
 
-int main() {
+int main()
+{
     struct sockaddr_in serv_addr;
     struct usb_keyboard_packet packet;
     int transferred, input_col = 2, input_row = 23;
@@ -87,27 +101,34 @@ int main() {
     pthread_create(&cursor_thread, NULL, cursor_blink_thread, NULL);
     pthread_detach(cursor_thread);
 
-    for (;;) {
+    for (;;)
+    {
         libusb_interrupt_transfer(keyboard, endpoint_address, (unsigned char *)&packet, sizeof(packet), &transferred, 0);
-        if (transferred == sizeof(packet)) {
+        if (transferred == sizeof(packet))
+        {
             char c = keycode_to_ascii(packet.keycode[0], packet.modifiers);
-            if (c && input_col - 2 < BUFFER_SIZE - 1) { // 🔹 Buffer Protection
+            if (c && input_col - 2 < BUFFER_SIZE - 1)
+            { // 🔹 Buffer Protection
                 fbputchar(c, input_row, input_col);
                 input_buffer[input_col - 2] = c;
                 input_col++;
             }
-            if (packet.keycode[0] == 0x2A && input_col > 2) { // Backspace
+            if (packet.keycode[0] == 0x2A && input_col > 2)
+            { // Backspace
                 input_col--;
                 fbputchar(' ', input_row, input_col);
                 input_buffer[input_col - 2] = '\0';
             }
-            if (packet.keycode[0] == 0x50 && input_col > 2) { // Left Arrow
+            if (packet.keycode[0] == 0x50 && input_col > 2)
+            { // Left Arrow
                 input_col--;
             }
-            if (packet.keycode[0] == 0x4F && input_col < 64 && input_buffer[input_col - 2]) { // Right Arrow
+            if (packet.keycode[0] == 0x4F && input_col < 64 && input_buffer[input_col - 2])
+            { // Right Arrow
                 input_col++;
             }
-            if (packet.keycode[0] == 0x28) { // Enter
+            if (packet.keycode[0] == 0x28)
+            { // Enter
                 send(sockfd, input_buffer, strlen(input_buffer), 0);
                 display_received_message(input_buffer);
                 memset(input_buffer, 0, sizeof(input_buffer));
