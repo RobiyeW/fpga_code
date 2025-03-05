@@ -68,6 +68,8 @@ char keycode_to_ascii(uint8_t keycode, uint8_t modifiers)
         return '-';
     case 0x2e:
         return '=';
+    case 0x34:
+        return '\'';
     case 0x36:
         return ',';
     case 0x37:
