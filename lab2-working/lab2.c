@@ -27,26 +27,62 @@ void *cursor_blink_thread(void *);
 
 char keycode_to_ascii(uint8_t keycode, uint8_t modifiers)
 {
-    // Standard QWERTY mapping based on USB HID keycodes
-    const char keymap[] = {
-        0, 0, 0, 0, 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
-        'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
-        '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '\n', '\b', '\t', ' ', '-', '=',
-        '[', ']', '\\', ';', '\'', '`', ',', '.', '/'};
+    // Key mappings for standard and shifted keys
+    static const char keymap[] =
+        "1234567890-=\t"   // Numbers and first row
+        "qwertyuiop[]\n"   // Second row
+        "asdfghjkl;'`\\\n" // Third row
+        "zxcvbnm,./ ";     // Fourth row (includes space)
 
-    const char shift_keymap[] = {
-        0, 0, 0, 0, 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
-        'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
-        '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '\n', '\b', '\t', ' ', '_', '+',
-        '{', '}', '|', ':', '"', '~', '<', '>', '?'};
+    static const char shift_keymap[] =
+        "!@#$%^&*()_+\t"   // Shifted numbers
+        "QWERTYUIOP{}\n"   // Shifted second row
+        "ASDFGHJKL:\"~|\n" // Shifted third row
+        "ZXCVBNM<>? ";     // Shifted fourth row (includes space)
 
-    // Ensure keycode is within bounds
-    if (keycode < 4 || keycode > 53)
+    if (keycode >= 4 && keycode <= 39)
+    {
+        return (modifiers & (USB_LSHIFT | USB_RSHIFT)) ? shift_keymap[keycode - 4] : keymap[keycode - 4];
+    }
+
+    // Handle special keys separately
+    switch (keycode)
+    {
+    case 0x2B:
+        return '\t'; // Tab
+    case 0x2C:
+        return ' '; // Space
+    case 0x28:
+        return '\n'; // Enter
+    case 0x2A:
+        return '\b'; // Backspace
+    default:
         return 0;
-
-    // Use shift map if Shift key is held
-    return (modifiers & (USB_LSHIFT | USB_RSHIFT)) ? shift_keymap[keycode - 4] : keymap[keycode - 4];
+    }
 }
+
+// char keycode_to_ascii(uint8_t keycode, uint8_t modifiers)
+// {
+//     // Standard QWERTY mapping based on USB HID keycodes
+//     const char keymap[] = {
+//         0, 0, 0, 0, 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
+//         'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+//         '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '\n', '\b', '\t', ' ', '-', '=',
+//         '[', ']', '\\', ';', '\'', '`', ',', '.', '/'};
+
+//     const char shift_keymap[] = {
+//         0, 0, 0, 0, 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
+//         'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+//         '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '\n', '\b', '\t', ' ', '_', '+',
+//         '{', '}', '|', ':', '"', '~', '<', '>', '?'};
+
+//     // Ensure keycode is within bounds
+//     if (keycode < 4 || keycode > 53)
+//         return 0;
+
+//     // Use shift map if Shift key is held
+//     return (modifiers & (USB_LSHIFT | USB_RSHIFT)) ? shift_keymap[keycode - 4] : keymap[keycode - 4];
+// }
 
 void *network_thread_f(void *ignored)
 {
