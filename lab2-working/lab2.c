@@ -29,9 +29,10 @@ char keycode_to_ascii(uint8_t keycode, uint8_t modifiers)
 {
     // Key mappings for standard and shifted keys
     static const char keymap[] =
-        "1234567890-=\t"   // Numbers and first row
-        "qwertyuiop[]\n"   // Second row
+
         "asdfghjkl;'`\\\n" // Third row
+        "qwertyuiop[]\n"   // Second row
+        "1234567890-=\t"   // Numbers and first row
         "zxcvbnm,./ ";     // Fourth row (includes space)
 
     static const char shift_keymap[] =
