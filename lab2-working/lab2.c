@@ -170,7 +170,8 @@ int main()
                 memset(message, 0, sizeof(message));
 
                 // Fetch stored input
-                strncpy(message, input_buffer, sizeof(message) - 1);
+                get_input_buffer(message, sizeof(message));
+
                 
                 send(sockfd, message, strlen(message), 0);
                 display_received_message(message);

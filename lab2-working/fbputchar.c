@@ -262,6 +262,12 @@ void store_input_char(int col, char c) {
     }
 }
 
+void get_input_buffer(char *dest, int size) {
+    strncpy(dest, input_buffer, size - 1);  // Copy stored input to provided buffer
+    dest[size - 1] = '\0'; // Ensure null termination
+}
+
+
 // Function to clear input buffer
 void clear_input_buffer() {
     memset(input_buffer, 0, sizeof(input_buffer));
