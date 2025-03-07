@@ -175,7 +175,7 @@ int main()
                 input_buffer[input_col - 2] = '\0';   // Remove from buffer safely
             }
             
-            if ((packet.keycode[0] == 0x2B || packet.keycode[0] == 0x43) && input_col < 60)
+            if ((packet.keycode[0] == 0x2B || packet.keycode[0] == 0x43) && input_col < 130)
             { // Tab (0x43) - Moves cursor forward 4 spaces
                 for (int i = 0; i < 4; i++)
                 {
