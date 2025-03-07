@@ -227,7 +227,7 @@ void scroll_text_up() {
            fb_finfo.line_length * FONT_HEIGHT);
 }
 
-void draw_cursor(int row, int col) {
+void draw_cursor(int row, int col, char *input_buffer) {
     static int prev_row = 23, prev_col = 2;  // 🔹 Keep track of previous position
 
     // 🔹 Restore character at old cursor position
