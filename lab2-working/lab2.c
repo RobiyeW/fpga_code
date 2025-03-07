@@ -56,11 +56,11 @@ char keycode_to_ascii(uint8_t keycode, uint8_t modifiers)
     // Handle special keys like Backspace, Tab, Space, Enter, etc.
     switch (keycode)
     {
-    case 0x2A:
+    case 0x42:
         return '\b'; // Backspace
     case 0x28:
         return '\n'; // Enter
-    case 0x2b:
+    case 0x43:
         return '\t'; // Tab
     case 0x2C:
         return ' '; // Space
