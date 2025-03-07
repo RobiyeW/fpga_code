@@ -138,12 +138,12 @@ int main()
 {
     struct sockaddr_in serv_addr;
     struct usb_keyboard_packet packet;
-    int transferred, input_col = 2, input_row = 23;
+    int transferred, input_col = 2, input_row = 48;
     char input_buffer[BUFFER_SIZE] = {0};
 
     fbopen();
     fbclear();
-    fbputs("> ", 23, 0);
+    fbputs("> ", 48, 0);
 
     keyboard = openkeyboard(&endpoint_address);
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
@@ -203,7 +203,7 @@ int main()
                 display_received_message(input_buffer);
                 memset(input_buffer, 0, sizeof(input_buffer));
                 fbclear_input_area();
-                fbputs("> ", 23, 0);
+                fbputs("> ", 48, 0);
                 input_col = 2;
             }
             usleep(10000); // 🔹 Small delay to ensure rendering catches up
