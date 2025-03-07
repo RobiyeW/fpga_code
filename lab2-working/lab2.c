@@ -78,7 +78,7 @@ char keycode_to_ascii(uint8_t keycode, uint8_t modifiers)
     default:
         // Log the unknown keycode for debugging
         printf("Unknown keycode: 0x%X\n", keycode);
-        return 0
+        return 0;
     }
 }
 
