@@ -137,17 +137,17 @@ int main()
     int col;
     struct sockaddr_in serv_addr;
     struct usb_keyboard_packet packet;
-    int transferred, input_col = 2, input_row = 42;
+    int transferred, input_col = 2, input_row = 43;
     char input_buffer[BUFFER_SIZE] = {0};
 
     for (col = 0; col < 130; col++)
     {
-        fbputchar('*', 42, col);
+        fbputchar('*', 43, col);
     }
 
     fbopen();
     fbclear();
-    fbputs("> ", 42, 0);
+    fbputs("> ", 43, 0);
 
     keyboard = openkeyboard(&endpoint_address);
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
@@ -174,20 +174,14 @@ int main()
             }
             if ((packet.keycode[0] == 0x2A || packet.keycode[0] == 0x42) && input_col > 2)
             {
-<<<<<<< HEAD
-                input_col--; //
-                == == == =
-                             input_col--;
->>>>>>> 45cee3c5156072fd06af4dcc49aa0bd2733cdc80
+                // input_col--; //
+                input_col--;
                 fbputchar(' ', input_row, input_col); // Clear character from framebuffer
                 input_buffer[input_col - 2] = '\0';   // Remove from buffer safely
             }
-
-<<<<<<< HEAD
             if ((packet.keycode[0] == 0x2B || packet.keycode[0] == 0x43) && input_col < 132)
                 == == == =
                              if ((packet.keycode[0] == 0x2B || packet.keycode[0] == 0x43) && input_col < 130)
->>>>>>> 45cee3c5156072fd06af4dcc49aa0bd2733cdc80
                 { // Tab (0x43) - Moves cursor forward 4 spaces
                     for (int i = 0; i < 4; i++)
                     {
@@ -211,24 +205,23 @@ int main()
 
             if (packet.keycode[0] == 0x28)
             {                                       // Enter key
-<<<<<<< HEAD
+                                                    // <<<<<<< HEAD
                 input_buffer[input_col - 2] = '\0'; // ✅ Ensure cursor is removed before sending
-                == == == =
-                             input_buffer[input_col - 3] = '\0'; // ✅ Ensure cursor is removed before sending
->>>>>>> 45cee3c5156072fd06af4dcc49aa0bd2733cdc80
+                input_buffer[input_col - 3] = '\0'; // ✅ Ensure cursor is removed before sending
+                                                    // >>>>>>> 45cee3c5156072fd06af4dcc49aa0bd2733cdc80
                 send(sockfd, input_buffer, strlen(input_buffer), 0);
                 display_received_message(input_buffer);
                 memset(input_buffer, 0, sizeof(input_buffer));
                 fbclear_input_area();
-                fbputs("> ", 42, 0);
+                fbputs("> ", 43, 0);
                 input_col = 2;
             }
-<<<<<<< HEAD
+            // <<<<<<< HEAD
 
-            == == == =
-                         // <<<<<<< HEAD
-                         // test///////////////////////////////////
-                if (c && input_col >= 2 && input_col - 2 < BUFFER_SIZE - 1)
+            // == == == =
+            //              // <<<<<<< HEAD
+            //              // test///////////////////////////////////
+            if (c && input_col >= 2 && input_col - 2 < BUFFER_SIZE - 1)
             {
                 input_buffer[input_col - 2] = c;    // Store character in buffer
                 fbputchar(c, input_row, input_col); // Display character
@@ -260,7 +253,7 @@ int main()
             // == == == =
 
             // >>>>>>> 7e6f00d353ef0e74049896b53bd1625c93cb9b15
->>>>>>> 45cee3c5156072fd06af4dcc49aa0bd2733cdc80
+            // >>>>>>> 45cee3c5156072fd06af4dcc49aa0bd2733cdc80
             usleep(10000); // 🔹 Small delay to ensure rendering catches up
             draw_cursor(input_row, input_col, input_buffer);
         }
