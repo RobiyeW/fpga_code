@@ -152,8 +152,10 @@ int main()
                 input_col++;
             }
             if ((packet.keycode[0] == 0x2A || packet.keycode[0] == 0x42) && input_col > 2)
-            { // Backspace (0x2A or 0x42)
+            { // Backspace (Handle both `0x2A` and `0x42`)
                 input_col--;
+                fbputchar(' ', input_row, input_col);  // Clear character from framebuffer
+                input_buffer[input_col - 2] = '\0';   // Remove from buffer
             }
             if ((packet.keycode[0] == 0x2B || packet.keycode[0] == 0x43) && input_col < 60)
             { // Tab (0x43) - Moves cursor forward 4 spaces
