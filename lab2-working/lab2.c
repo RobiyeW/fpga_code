@@ -112,19 +112,16 @@ void *cursor_blink_thread(void *arg)
             fbputchar(input_buffer[prev_col - 2] ? input_buffer[prev_col - 2] : ' ', prev_row, prev_col);
         }
 
-        // 🔹 Toggle cursor visibility
-        if (blink_state)
-        {
-            fbputchar('_', row, col);
-        }
-        else
-        {
-            fbputchar(' ', row, col);
-        }
-        
-        blink_state = !blink_state;
+        // 🔹 Draw new cursor
+        fbputchar('_', row, col);
 
-        // 🔹 Update previous position
+        // 🔹 Update cursor position
+        if (input_buffer[col - 2] != '\0' && col < 64) { 
+            col++;  // Move cursor right when typing
+        } else if (col > 2 && input_buffer[col - 3] == '\0') {
+            col--;  // Move cursor left if backspace was pressed
+        }
+
         prev_row = row;
         prev_col = col;
 
@@ -133,6 +130,7 @@ void *cursor_blink_thread(void *arg)
 
     return NULL;
 }
+
 
 int main()
 {
