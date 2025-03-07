@@ -245,7 +245,7 @@ void draw_cursor(int row, int col, char *input_buffer) {
     // Handle cursor movement back to row 43 when moving left past col 0 in row 44
     if (col < 0 && row == 44) {
         row = 43;
-        col = 126;
+        col = 128;
     }
 
     // Draw cursor at the correct position
