@@ -222,7 +222,7 @@ void display_received_message(const char *message) {
 
 void scroll_text_up() {
     int start_row = 0;  // Start scrolling from the top
-    int end_row = 51;   // Stop scrolling at row 41
+    int end_row = 42;   // Stop scrolling at row 41
     int scroll_height = (end_row - 1) * FONT_HEIGHT; // Rows to move
     int start_offset = fb_finfo.line_length * start_row * FONT_HEIGHT;
 
