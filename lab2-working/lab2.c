@@ -98,27 +98,6 @@ void *network_thread_f(void *ignored)
     return NULL;
 }
 
-void *cursor_blink_thread(void *arg)
-{
-    char *input_buffer = (char *)arg;  // Correctly cast void* to char*
-    int blink_state = 1;
-    
-    while (1)
-    {
-        if (blink_state)
-        {
-            draw_cursor(23, 2, input_buffer);
-        }
-        else
-        {
-            fbputchar(' ', 23, 2);
-        }
-        blink_state = !blink_state;
-        usleep(500000); // 500ms
-    }
-    return NULL;
-}
-
 
 int main()
 {
@@ -139,7 +118,7 @@ int main()
     connect(sockfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr));
 
     pthread_create(&network_thread, NULL, network_thread_f, NULL);
-    pthread_create(&cursor_thread, NULL, cursor_blink_thread, (void *)input_buffer);
+    pthread_create(&cursor_thread, NULL, (void *(*)(void *))draw_cursor, (void *)input_buffer);
     pthread_detach(cursor_thread);
 
     for (;;)

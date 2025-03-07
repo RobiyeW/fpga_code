@@ -6,6 +6,7 @@
 #include <sys/mman.h>
 #include <sys/ioctl.h>
 #include <linux/fb.h>
+#include <unistd.h>
 
 #define FBDEV "/dev/fb0"
 
@@ -228,19 +229,29 @@ void scroll_text_up() {
 }
 
 void draw_cursor(int row, int col, char *input_buffer) {
-    static int prev_row = 23, prev_col = 2;  // 🔹 Keep track of previous position
+    static int prev_row = 23, prev_col = 2;  
+    static int blink_state = 1;
 
-    // 🔹 Restore character at old cursor position
-    if (prev_col >= 2) {
-        fbputchar(input_buffer[prev_col - 2] ? input_buffer[prev_col - 2] : ' ', prev_row, prev_col);
+    while (1) {  // Continuous blinking loop
+        // Restore character at previous cursor position
+        if (prev_col >= 2) {
+            fbputchar(input_buffer[prev_col - 2] ? input_buffer[prev_col - 2] : ' ', prev_row, prev_col);
+        }
+
+        // Toggle cursor visibility
+        if (blink_state) {
+            fbputchar('_', row, col);  // Draw cursor
+        } else {
+            fbputchar(' ', row, col);  // Erase cursor
+        }
+        blink_state = !blink_state;
+
+        // Update previous position
+        prev_row = row;
+        prev_col = col;
+
+        usleep(500000); // 500ms delay for blinking
     }
-
-    // 🔹 Draw new cursor
-    fbputchar('_', row, col);
-
-    // 🔹 Update previous position
-    prev_row = row;
-    prev_col = col;
 }
 
 
