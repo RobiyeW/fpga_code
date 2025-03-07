@@ -167,6 +167,11 @@ void fbclear() {
 }
 
 void fbputchar(char c, int row, int col) {
+    if (c == '\b') {
+        fbputchar(' ', row, col); // Erase the previous character
+        return;
+    }
+    
     int x, y;
     unsigned char pixels, *pixelp = font + FONT_HEIGHT * c;
     unsigned char mask;
@@ -190,6 +195,7 @@ void fbputchar(char c, int row, int col) {
         }
     }
 }
+
 
 void fbputs(const char *s, int row, int col) {
     while (*s) fbputchar(*s++, row, col++);
