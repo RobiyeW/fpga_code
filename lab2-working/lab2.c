@@ -216,10 +216,15 @@ int main()
                     for (int i = 0; i < remaining_in_row; i++) {
                         fbputchar(' ', input_row, input_col);
                         input_col++;
+                        fbputchar(' ', input_row, input_col);
+                        input_col++;
+                        fbputchar(' ', input_row, input_col);
+                        input_col++;
+                        fbputchar(' ', input_row, input_col);
+                        input_col++;
                     }
                     input_col = 0;
                     input_row = 44;
-                    spaces_to_add -= remaining_in_row; // Reduce remaining spaces
                 }
             
                 // Apply remaining tab spaces (ensure we don't exceed column 132 in row 44)
