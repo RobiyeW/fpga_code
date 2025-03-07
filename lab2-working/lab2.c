@@ -165,7 +165,21 @@ int main()
 
     for (;;)
     {
-        libusb_interrupt_transfer(keyboard, endpoint_address, (unsigned char *)&packet, sizeof(packet), &transferred, 0);
+        int status = libusb_interrupt_transfer(keyboard, endpoint_address, 
+            (unsigned char *)&packet, sizeof(packet), 
+            &transferred, 0);
+        if (status != 0) {
+        printf("USB Transfer Error: %d\n", status);
+        }
+
+        if (transferred == sizeof(packet))
+        {
+        printf("Raw USB Data: Keycode[0]=0x%X Modifiers=0x%X\n", packet.keycode[0], packet.modifiers);
+        char c = keycode_to_ascii(packet.keycode[0], packet.modifiers);
+        if (c) {
+        printf("Recognized character: %c\n", c);
+        }
+        }
         if (transferred == sizeof(packet))
         {
             char c = keycode_to_ascii(packet.keycode[0], packet.modifiers);
