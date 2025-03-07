@@ -235,6 +235,10 @@ void draw_cursor(int row, int col, char *input_buffer) {
         fbputchar(input_buffer[prev_col - 2] ? input_buffer[prev_col - 2] : ' ', prev_row, prev_col);
     }
 
+    if (input_buffer >= 132) {
+        fbputchar('_', row+1, col++);
+    }
+
     // Draw cursor but do NOT modify input_buffer
     fbputchar('_', row, col++);
 
