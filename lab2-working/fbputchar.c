@@ -239,7 +239,7 @@ void draw_cursor(int row, int col, char *input_buffer) {
     // Handle cursor movement to row 44 when exceeding col 131
     if (col >= 128 && row == 43) {
         row = 44;
-        col = 0;
+        col = 1;
     }
 
     // Handle cursor movement back to row 43 when moving left past col 0 in row 44
