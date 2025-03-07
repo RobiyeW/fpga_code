@@ -206,6 +206,29 @@ int main()
                 fbputs("> ", 43, 0);
                 input_col = 2;
             }
+            //test///////////////////////////////////
+            if (c && input_col - 2 < BUFFER_SIZE - 1)
+            {
+                input_buffer[input_col - 2] = c;          // Store character in buffer
+                fbputchar(c, input_row, input_col);         // Display character
+                input_col++;                                // Move cursor right
+
+                // Wrap-around logic: if we've reached the right edge of the screen,
+                // reset the column (accounting for the prompt) and move down one row.
+                if (input_col >= MAX_COL)
+                {
+                    input_col = 2;  // Reset to starting column (after prompt)
+                    input_row++;    // Move down one line
+
+                    // If we exceed the bottom of the display, scroll or reset to the last row.
+                    if (input_row >= MAX_ROW)
+                    {
+                        scroll_screen();        // Implement your scrolling here
+                        input_row = MAX_ROW - 1;  // Adjust to keep the cursor in bounds
+                    }
+                }
+                draw_cursor(input_row, input_col, input_buffer); // Update the cursor position
+            }
             usleep(10000); // 🔹 Small delay to ensure rendering catches up
             draw_cursor(input_row, input_col, input_buffer);
             
