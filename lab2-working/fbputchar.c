@@ -227,47 +227,20 @@ void scroll_text_up() {
            fb_finfo.line_length * FONT_HEIGHT);
 }
 
-void draw_cursor(int row, int col) {
-    static int prev_row = 43, prev_col = 0;
+void draw_cursor(int row, int col, char *input_buffer) {
+    static int prev_row = 43, prev_col = 2;
 
-    // Restore the previous character using the global input_buffer
-    if (prev_col >= 0) {
-        int restore_row = prev_row;
-        int restore_col = prev_col;
-
-        // Handle row transitions
-        if (prev_col >= 132) {
-            restore_col = prev_col - 132;
-            restore_row = 44;
-        } 
-        else if (prev_col < 0 && prev_row == 44) {
-            restore_col = 131;
-            restore_row = 43;
-        }
-
-        fbputchar(input_buffer[restore_row * 132 + restore_col] ? input_buffer[restore_row * 132 + restore_col] : ' ', restore_row, restore_col);
-    }
-
-    // Handle rightward movement past col 131 in row 43
-    if (col >= 132 && row == 43) {
-        row = 44;
-        col = 0;
-    }
-
-    // Handle leftward movement past col 0 in row 44
-    if (col < 0 && row == 44) {
-        row = 43;
-        col = 131;
+    // Restore previous character instead of drawing cursor in the buffer
+    if (prev_col >= 2) {
+        fbputchar(input_buffer[prev_col - 2] ? input_buffer[prev_col - 2] : ' ', prev_row, prev_col);
     }
 
     // Draw cursor but do NOT modify input_buffer
     fbputchar('_', row, col);
 
-    // Update previous position
     prev_row = row;
     prev_col = col;
 }
-
 
 
 
