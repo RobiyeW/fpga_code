@@ -23,7 +23,7 @@ struct libusb_device_handle *keyboard;
 uint8_t endpoint_address;
 pthread_t network_thread, cursor_thread;
 void *network_thread_f(void *);
-void *cursor_blink_thread(void *);
+// void *cursor_blink_thread(void *);
 
 char keycode_to_ascii(uint8_t keycode, uint8_t modifiers)
 {
@@ -98,41 +98,7 @@ void *network_thread_f(void *ignored)
     return NULL;
 }
 
-void *cursor_blink_thread(void *arg)
-{
-    char *input_buffer = (char *)arg;  // Correctly cast void* to char*
-    static int prev_row = 23, prev_col = 2;  // 🔹 Keep track of previous position
-    int row = 23, col = 2;
-    int blink_state = 1;
-
-    while (1)
-    {
-        // 🔹 Restore character at old cursor position
-        if (prev_col >= 2) {
-            fbputchar(input_buffer[prev_col - 2] ? input_buffer[prev_col - 2] : ' ', prev_row, prev_col);
-        }
-
-        // 🔹 Toggle cursor visibility
-        if (blink_state)
-        {
-            fbputchar('_', row, col);
-        }
-        else
-        {
-            fbputchar(' ', row, col);
-        }
-        
-        blink_state = !blink_state;
-
-        // 🔹 Update previous position
-        prev_row = row;
-        prev_col = col;
-
-        usleep(500000); // 500ms blink interval
-    }
-
-    return NULL;
-}
+//
 
 int main()
 {
@@ -153,8 +119,8 @@ int main()
     connect(sockfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr));
 
     pthread_create(&network_thread, NULL, network_thread_f, NULL);
-    pthread_create(&cursor_thread, NULL, cursor_blink_thread, (void *)input_buffer);
-    
+    pthread_detach(network_thread);
+
     for (;;)
     {
         libusb_interrupt_transfer(keyboard, endpoint_address, (unsigned char *)&packet, sizeof(packet), &transferred, 0);
@@ -162,7 +128,7 @@ int main()
         {
             char c = keycode_to_ascii(packet.keycode[0], packet.modifiers);
             if (c && input_col - 2 < BUFFER_SIZE - 1)
-            { 
+            {
                 input_buffer[input_col - 2] = c;  
                 fbputchar(c, input_row, input_col);
                 input_col++;
@@ -185,15 +151,15 @@ int main()
             }
     
             if (packet.keycode[0] == 0x50 && input_col > 2)
-            { 
+            {
                 fbputchar(input_buffer[input_col - 2], input_row, input_col);
-                input_col--;  
+                input_col--;
                 draw_cursor(input_row, input_col, input_buffer);
             }
             if (packet.keycode[0] == 0x4F && input_col < 64 && input_buffer[input_col - 2] != '\0')
             {
                 fbputchar(input_buffer[input_col - 2], input_row, input_col);
-                input_col++;  
+                input_col++;
                 draw_cursor(input_row, input_col, input_buffer);
             }
             
@@ -206,16 +172,12 @@ int main()
                 fbputs("> ", 23, 0);
                 input_col = 2;
             }
-
             usleep(10000);
             draw_cursor(input_row, input_col, input_buffer);
         }
     }
 
     pthread_cancel(network_thread);
-    pthread_cancel(cursor_thread);
     pthread_join(network_thread, NULL);
-    pthread_join(cursor_thread, NULL);
-
     return 0;
 }
