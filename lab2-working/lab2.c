@@ -101,11 +101,12 @@ void *network_thread_f(void *ignored)
 void *cursor_blink_thread(void *arg)
 {
     int blink_state = 1;
+    char *input_buffer = (char *)arg;
     while (1)
     {
         if (blink_state)
         {
-            draw_cursor(23, 2);
+            draw_cursor(23, 2, input_buffer);
         }
         else
         {
@@ -150,7 +151,7 @@ int main()
                 input_buffer[input_col - 2] = c;  
                 fbputchar(c, input_row, input_col);
                 input_col++;
-                draw_cursor(input_row, input_col);  // 🔹 Update cursor immediately
+                draw_cursor(input_row, input_col, input_buffer);  // 🔹 Update cursor immediately
             }
             if ((packet.keycode[0] == 0x2A || packet.keycode[0] == 0x42) && input_col > 2)
             { // Backspace (Handle both `0x2A` and `0x42`)
@@ -171,13 +172,13 @@ int main()
             { // Left Arrow (0x50)
                 fbputchar(input_buffer[input_col - 2], input_row, input_col);  // 🔹 Restore original character
                 input_col--;  // 🔹 Move left
-                draw_cursor(input_row, input_col);  // 🔹 Redraw cursor at new position
+                draw_cursor(input_row, input_col, input_buffer);  // 🔹 Redraw cursor at new position
             }
             if (packet.keycode[0] == 0x4F && input_col < 64 && input_buffer[input_col - 2] != '\0')
             { // Right Arrow (0x4F)
                 fbputchar(input_buffer[input_col - 2], input_row, input_col);  // 🔹 Restore original character
                 input_col++;  // 🔹 Move right
-                draw_cursor(input_row, input_col);  // 🔹 Redraw cursor at new position
+                draw_cursor(input_row, input_col, input_buffer);  // 🔹 Redraw cursor at new position
             }
             
             if (packet.keycode[0] == 0x28)
@@ -190,7 +191,7 @@ int main()
                 input_col = 2;
             }
             usleep(10000); // 🔹 Small delay to ensure rendering catches up
-            draw_cursor(input_row, input_col);
+            draw_cursor(input_row, input_col, input_buffer);
             
         }
     }
