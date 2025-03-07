@@ -229,7 +229,7 @@ int main()
                     // If we exceed the bottom of the display, scroll or reset to the last row.
                     if (input_row >= MAX_ROW)
                     {
-                        scroll_screen();         // Implement your scrolling here
+                        // scroll_screen();         // Implement your scrolling here
                         input_row = MAX_ROW - 1; // Adjust to keep the cursor in bounds
                     }
                 }
