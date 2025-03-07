@@ -228,7 +228,7 @@ int main()
                     fbputchar(' ', input_row, input_col);
                     fbputchar(' ', input_row, input_col);
                     fbputchar(' ', input_row, input_col);
-                    input_col+4;
+                    input_col = input_col + 4;
                 }
             
                 draw_cursor(input_row, input_col, input_buffer);
