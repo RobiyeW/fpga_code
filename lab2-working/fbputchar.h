@@ -14,7 +14,7 @@ extern void fbclear(void);
 extern void fbclear_input_area(void);
 extern void display_received_message(const char *);
 extern void scroll_text_up(void);
-extern void draw_cursor(int, int, char *input_buffer);
+extern void draw_cursor(int, int);
 
 
 

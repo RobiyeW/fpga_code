@@ -188,7 +188,7 @@ int main()
                     input_row = 44; // Move cursor to the second row
                 }
 
-                draw_cursor(input_row, input_col, input_buffer);
+                draw_cursor(input_row, input_col);
             }
 
             // Handle backspace (0x2A)
@@ -204,7 +204,7 @@ int main()
 
                 fbputchar(' ', input_row, input_col); // Clear character visually
                 input_buffer[strlen(input_buffer) - 1] = '\0'; // Remove from buffer
-                draw_cursor(input_row, input_col, input_buffer);
+                draw_cursor(input_row, input_col);
             }
             
             if ((packet.keycode[0] == 0x2B || packet.keycode[0] == 0x43)) { // Tab Key
@@ -228,7 +228,7 @@ int main()
                     input_col++;
                 }
             
-                draw_cursor(input_row, input_col, input_buffer);
+                draw_cursor(input_row, input_col);
             }
             
     
@@ -243,7 +243,7 @@ int main()
                 }
 
                 fbputchar(input_buffer[input_col], input_row, input_col); // Restore character
-                draw_cursor(input_row, input_col, input_buffer); // Update cursor
+                draw_cursor(input_row, input_col); // Update cursor
             }
 
             // Right Arrow Key (0x4F)
@@ -257,7 +257,7 @@ int main()
                 }
 
                 fbputchar(input_buffer[input_col], input_row, input_col); // Restore character
-                draw_cursor(input_row, input_col, input_buffer); // Update cursor
+                draw_cursor(input_row, input_col); // Update cursor
             }
 
             
@@ -292,7 +292,7 @@ int main()
 
             
             usleep(10000); // 🔹 Small delay to ensure rendering catches up
-            draw_cursor(input_row, input_col, input_buffer);
+            draw_cursor(input_row, input_col);
             
         }
     }

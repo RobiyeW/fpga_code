@@ -227,15 +227,15 @@ void scroll_text_up() {
            fb_finfo.line_length * FONT_HEIGHT);
 }
 
-void draw_cursor(int row, int col, char *input_buffer) {
+void draw_cursor(int row, int col) {
     static int prev_row = 43, prev_col = 0;
 
-    // Restore the previous character
+    // Restore the previous character using the global input_buffer
     if (prev_col >= 0) {
         int restore_row = prev_row;
         int restore_col = prev_col;
 
-        // Adjust row transition logic for multiline text
+        // Handle row transitions
         if (prev_col >= 132) {
             restore_col = prev_col - 132;
             restore_row = 44;
@@ -245,16 +245,16 @@ void draw_cursor(int row, int col, char *input_buffer) {
             restore_row = 43;
         }
 
-        fbputchar(input_buffer[restore_col] ? input_buffer[restore_col] : ' ', restore_row, restore_col);
+        fbputchar(input_buffer[restore_row * 132 + restore_col] ? input_buffer[restore_row * 132 + restore_col] : ' ', restore_row, restore_col);
     }
 
-    // Handle row transitions when moving right
+    // Handle rightward movement past col 131 in row 43
     if (col >= 132 && row == 43) {
         row = 44;
         col = 0;
-    } 
+    }
 
-    // Handle row transitions when moving left
+    // Handle leftward movement past col 0 in row 44
     if (col < 0 && row == 44) {
         row = 43;
         col = 131;
