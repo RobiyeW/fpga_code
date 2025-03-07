@@ -203,7 +203,7 @@ void fbputs(const char *s, int row, int col) {
 }
 
 void fbclear_input_area() {
-    for (int row = 23; row <= 24; row++) {
+    for (int row = 43; row <= 44; row++) {
         for (int col = 0; col < 64; col++) {
             fbputchar(' ', row, col);
         }
@@ -228,7 +228,7 @@ void scroll_text_up() {
 }
 
 void draw_cursor(int row, int col, char *input_buffer) {
-    static int prev_row = 23, prev_col = 2;  // 🔹 Keep track of previous position
+    static int prev_row = 43, prev_col = 2;  // 🔹 Keep track of previous position
 
     // 🔹 Restore character at old cursor position
     if (prev_col >= 2) {
