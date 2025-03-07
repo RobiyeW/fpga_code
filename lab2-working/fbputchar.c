@@ -204,7 +204,7 @@ void fbputs(const char *s, int row, int col) {
 
 void fbclear_input_area() {
     for (int row = 43; row <= 44; row++) {
-        for (int col = 0; col < 64; col++) {
+        for (int col = 0; col < 132; col++) {
             fbputchar(' ', row, col);
         }
     }

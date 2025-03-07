@@ -258,6 +258,7 @@ int main()
             }
             
             usleep(10000); // 🔹 Small delay to ensure rendering catches up
+            fbputs("> ", 43, 0);
             draw_cursor(input_row, input_col, input_buffer);
             
         }
