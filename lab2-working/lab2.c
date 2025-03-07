@@ -146,11 +146,10 @@ int main()
         {
             char c = keycode_to_ascii(packet.keycode[0], packet.modifiers);
             if (c && input_col - 2 < BUFFER_SIZE - 1)
-            { // 🔹 Ensure character is stored BEFORE moving cursor
-                input_buffer[input_col - 2] = c;  
+            { // 🔹 Buffer Protection
                 fbputchar(c, input_row, input_col);
+                input_buffer[input_col - 2] = c;
                 input_col++;
-                draw_cursor(input_row, input_col);  // 🔹 Update cursor immediately
             }
             if ((packet.keycode[0] == 0x2A || packet.keycode[0] == 0x42) && input_col > 2)
             { // Backspace (Handle both `0x2A` and `0x42`)
@@ -189,9 +188,7 @@ int main()
                 fbputs("> ", 23, 0);
                 input_col = 2;
             }
-            usleep(10000); // 🔹 Small delay to ensure rendering catches up
             draw_cursor(input_row, input_col);
-            
         }
     }
 
