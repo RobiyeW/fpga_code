@@ -236,7 +236,7 @@ void draw_cursor(int row, int col, char *input_buffer) {
     }
 
     // Draw cursor but do NOT modify input_buffer
-    fbputchar('_', row, col);
+    fbputchar('_', row, col+1);
 
     prev_row = row;
     prev_col = col;
