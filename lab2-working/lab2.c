@@ -136,6 +136,7 @@ void *network_thread_f(void *ignored)
 
 int main()
 {
+    int col;
     struct sockaddr_in serv_addr;
     struct usb_keyboard_packet packet;
     int transferred, input_col = 2, input_row = 43;
