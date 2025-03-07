@@ -166,61 +166,62 @@ int main()
     pthread_create(&network_thread, NULL, network_thread_f, NULL);
     pthread_detach(network_thread);
 
+
     for (;;)
     {
         libusb_interrupt_transfer(keyboard, endpoint_address, (unsigned char *)&packet, sizeof(packet), &transferred, 0);
         if (transferred == sizeof(packet))
         {
             char c = keycode_to_ascii(packet.keycode[0], packet.modifiers);
-            if (c && input_col - 2 < BUFFER_SIZE - 1)
-            { // 🔹 Ensure character is stored BEFORE moving cursor
-                input_buffer[input_col - 2] = c;  
+            if (c && strlen(input_buffer) < BUFFER_SIZE - 1)
+            { 
+                // Store character in buffer
+                input_buffer[strlen(input_buffer)] = c;
+                
+                // Print character on screen
                 fbputchar(c, input_row, input_col);
                 input_col++;
-                draw_cursor(input_row, input_col, input_buffer);  // 🔹 Update cursor immediately
+
+                // Wrap to next line when reaching column limit (assume 64 columns)
+                if (input_col >= 64)
+                {
+                    input_col = 0; // Reset column to beginning
+                    input_row = 44; // Move cursor to the second row
+                }
+
+                draw_cursor(input_row, input_col, input_buffer);
             }
-            if ((packet.keycode[0] == 0x2A || packet.keycode[0] == 0x42) && input_col > 2)
+
+            // Handle backspace (0x2A)
+            if (packet.keycode[0] == 0x2A && strlen(input_buffer) > 0)
             {
                 input_col--;
-                fbputchar(' ', input_row, input_col);  // Clear character from framebuffer
-                input_buffer[input_col - 2] = '\0';   // Remove from buffer safely
-            }
-            
-            if ((packet.keycode[0] == 0x2B || packet.keycode[0] == 0x43) && input_col < 132)
-            { // Tab (0x43) - Moves cursor forward 4 spaces
-                for (int i = 0; i < 4; i++)
+
+                if (input_col < 0)  // Move cursor back to previous row if needed
                 {
-                    fbputchar(' ', input_row, input_col);
-                    input_col++;
+                    input_col = 63; // Move to last column of previous row
+                    input_row = 43;
                 }
+
+                fbputchar(' ', input_row, input_col); // Clear character visually
+                input_buffer[strlen(input_buffer) - 1] = '\0'; // Remove from buffer
+                draw_cursor(input_row, input_col, input_buffer);
             }
-    
-            if (packet.keycode[0] == 0x50 && input_col > 2)
-            { // Left Arrow (0x50)
-                fbputchar(input_buffer[input_col - 2], input_row, input_col);  // 🔹 Restore original character
-                input_col--;  // 🔹 Move left
-                draw_cursor(input_row, input_col, input_buffer);  // 🔹 Redraw cursor at new position
-            }
-            if (packet.keycode[0] == 0x4F && input_col < 64 && input_buffer[input_col - 2] != '\0')
-            { // Right Arrow (0x4F)
-                fbputchar(input_buffer[input_col - 2], input_row, input_col);  // 🔹 Restore original character
-                input_col++;  // 🔹 Move right
-                draw_cursor(input_row, input_col, input_buffer);  // 🔹 Redraw cursor at new position
-            }
-            
-            if (packet.keycode[0] == 0x28) { // Enter key
-                input_buffer[input_col - 3] = '\0';  // ✅ Ensure cursor is removed before sending
+
+            // Handle Enter (0x28)
+            if (packet.keycode[0] == 0x28)
+            {
                 send(sockfd, input_buffer, strlen(input_buffer), 0);
                 display_received_message(input_buffer);
                 memset(input_buffer, 0, sizeof(input_buffer));
                 fbclear_input_area();
                 fbputs("> ", 43, 0);
-                input_col = 2;
+                input_col = 0;
+                input_row = 43; // Reset cursor to first input row
             }
-            
-            usleep(10000); // 🔹 Small delay to ensure rendering catches up
+
+            usleep(10000);
             draw_cursor(input_row, input_col, input_buffer);
-            
         }
     }
 
