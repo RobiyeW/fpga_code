@@ -34,7 +34,7 @@ char keycode_to_ascii(uint8_t keycode, uint8_t modifiers)
         'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', // 14-23
         'u', 'v', 'w', 'x', 'y', 'z', '1', '2', '3', '4', // 24-33
         '5', '6', '7', '8', '9', '0', '-', '=', '[', ' ', // 34-43
-        ' ', '-', '=', '[', ']', '\\', '/', ' '          // 44-50 (Space at 50)
+        ' ', '-', '=', '[', ']', '\\', '/', ' '           // 44-50 (Space at 50)
     };
 
     static const char shift_keymap[] = {
@@ -82,10 +82,6 @@ char keycode_to_ascii(uint8_t keycode, uint8_t modifiers)
     }
 }
 
-
-
-
-
 void *network_thread_f(void *ignored)
 {
     char recvBuf[BUFFER_SIZE];
@@ -121,7 +117,7 @@ void *network_thread_f(void *ignored)
 //         {
 //             fbputchar(' ', row, col);
 //         }
-        
+
 //         blink_state = !blink_state;
 
 //         // 🔹 Update previous position
@@ -142,9 +138,10 @@ int main()
     int transferred, input_col = 2, input_row = 43;
     char input_buffer[BUFFER_SIZE] = {0};
 
-    // for (col = 0; col < 132; col++) {
-    //     fbputchar('*', 42, col);
-    // }
+    for (col = 0; col < 132; col++)
+    {
+        fbputchar('*', 42, col);
+    }
 
     fbopen();
     fbclear();
@@ -168,18 +165,18 @@ int main()
             char c = keycode_to_ascii(packet.keycode[0], packet.modifiers);
             if (c && input_col - 2 < BUFFER_SIZE - 1)
             { // 🔹 Ensure character is stored BEFORE moving cursor
-                input_buffer[input_col - 2] = c;  
+                input_buffer[input_col - 2] = c;
                 fbputchar(c, input_row, input_col);
                 input_col++;
-                draw_cursor(input_row, input_col, input_buffer);  // 🔹 Update cursor immediately
+                draw_cursor(input_row, input_col, input_buffer); // 🔹 Update cursor immediately
             }
             if ((packet.keycode[0] == 0x2A || packet.keycode[0] == 0x42) && input_col > 2)
             {
                 input_col--;
-                fbputchar(' ', input_row, input_col);  // Clear character from framebuffer
+                fbputchar(' ', input_row, input_col); // Clear character from framebuffer
                 input_buffer[input_col - 2] = '\0';   // Remove from buffer safely
             }
-            
+
             if ((packet.keycode[0] == 0x2B || packet.keycode[0] == 0x43) && input_col < 132)
             { // Tab (0x43) - Moves cursor forward 4 spaces
                 for (int i = 0; i < 4; i++)
@@ -188,22 +185,23 @@ int main()
                     input_col++;
                 }
             }
-    
+
             if (packet.keycode[0] == 0x50 && input_col > 2)
-            { // Left Arrow (0x50)
-                fbputchar(input_buffer[input_col - 2], input_row, input_col);  // 🔹 Restore original character
-                input_col--;  // 🔹 Move left
-                draw_cursor(input_row, input_col, input_buffer);  // 🔹 Redraw cursor at new position
+            {                                                                 // Left Arrow (0x50)
+                fbputchar(input_buffer[input_col - 2], input_row, input_col); // 🔹 Restore original character
+                input_col--;                                                  // 🔹 Move left
+                draw_cursor(input_row, input_col, input_buffer);              // 🔹 Redraw cursor at new position
             }
             if (packet.keycode[0] == 0x4F && input_col < 64 && input_buffer[input_col - 2] != '\0')
-            { // Right Arrow (0x4F)
-                fbputchar(input_buffer[input_col - 2], input_row, input_col);  // 🔹 Restore original character
-                input_col++;  // 🔹 Move right
-                draw_cursor(input_row, input_col, input_buffer);  // 🔹 Redraw cursor at new position
+            {                                                                 // Right Arrow (0x4F)
+                fbputchar(input_buffer[input_col - 2], input_row, input_col); // 🔹 Restore original character
+                input_col++;                                                  // 🔹 Move right
+                draw_cursor(input_row, input_col, input_buffer);              // 🔹 Redraw cursor at new position
             }
-            
-            if (packet.keycode[0] == 0x28) { // Enter key
-                input_buffer[input_col - 3] = '\0';  // ✅ Ensure cursor is removed before sending
+
+            if (packet.keycode[0] == 0x28)
+            {                                       // Enter key
+                input_buffer[input_col - 3] = '\0'; // ✅ Ensure cursor is removed before sending
                 send(sockfd, input_buffer, strlen(input_buffer), 0);
                 display_received_message(input_buffer);
                 memset(input_buffer, 0, sizeof(input_buffer));
@@ -212,35 +210,34 @@ int main()
                 input_col = 2;
             }
 <<<<<<< HEAD
-            //test///////////////////////////////////
+            // test///////////////////////////////////
             if (c && input_col - 2 < BUFFER_SIZE - 1)
             {
-                input_buffer[input_col - 2] = c;          // Store character in buffer
-                fbputchar(c, input_row, input_col);         // Display character
-                input_col++;                                // Move cursor right
+                input_buffer[input_col - 2] = c;    // Store character in buffer
+                fbputchar(c, input_row, input_col); // Display character
+                input_col++;                        // Move cursor right
 
                 // Wrap-around logic: if we've reached the right edge of the screen,
                 // reset the column (accounting for the prompt) and move down one row.
                 if (input_col >= MAX_COL)
                 {
-                    input_col = 2;  // Reset to starting column (after prompt)
-                    input_row++;    // Move down one line
+                    input_col = 2; // Reset to starting column (after prompt)
+                    input_row++;   // Move down one line
 
                     // If we exceed the bottom of the display, scroll or reset to the last row.
                     if (input_row >= MAX_ROW)
                     {
-                        scroll_screen();        // Implement your scrolling here
-                        input_row = MAX_ROW - 1;  // Adjust to keep the cursor in bounds
+                        scroll_screen();         // Implement your scrolling here
+                        input_row = MAX_ROW - 1; // Adjust to keep the cursor in bounds
                     }
                 }
                 draw_cursor(input_row, input_col, input_buffer); // Update the cursor position
             }
-=======
+            == == == =
             
 >>>>>>> 7e6f00d353ef0e74049896b53bd1625c93cb9b15
-            usleep(10000); // 🔹 Small delay to ensure rendering catches up
+                         usleep(10000); // 🔹 Small delay to ensure rendering catches up
             draw_cursor(input_row, input_col, input_buffer);
-            
         }
     }
 
