@@ -143,7 +143,7 @@ int main()
 
     fbopen();
     fbclear();
-    fbputs("> ", 23, 0);
+    fbputs("> ", 53, 0);
 
     keyboard = openkeyboard(&endpoint_address);
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
