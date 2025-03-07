@@ -277,15 +277,18 @@ int main()
                 send(sockfd, message_to_send, strlen(message_to_send), 0);  // Send to server
                 display_received_message(message_to_send);  
 
-                // Clear input area
+                // Clear input area for both rows 43 and 44
                 memset(input_buffer, 0, sizeof(input_buffer));
                 fbclear_input_area();
+                
+                // Redraw the user input prompt in row 43
                 fbputs("> ", 43, 0);
 
-                // Reset cursor to start of row 43
+                // Reset cursor and input tracking
                 input_col = 0;
                 input_row = 43;
             }
+
 
             
             usleep(10000); // 🔹 Small delay to ensure rendering catches up
