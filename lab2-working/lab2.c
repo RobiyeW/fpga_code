@@ -232,18 +232,34 @@ int main()
             }
             
     
-            if (packet.keycode[0] == 0x50 && input_col > 2)
-            { // Left Arrow (0x50)
-                fbputchar(input_buffer[input_col - 2], input_row, input_col);  // 🔹 Restore original character
-                input_col--;  // 🔹 Move left
-                draw_cursor(input_row, input_col, input_buffer);  // 🔹 Redraw cursor at new position
+            // Left Arrow Key (0x50)
+            if (packet.keycode[0] == 0x50) {
+                if (input_col > 0) {  
+                    input_col--;  // Move left within the row
+                } 
+                else if (input_col == 0 && input_row == 44) {  
+                    input_row = 43;  // Move up to row 43
+                    input_col = 131; // Move to last column of row 43
+                }
+
+                fbputchar(input_buffer[input_col], input_row, input_col); // Restore character
+                draw_cursor(input_row, input_col, input_buffer); // Update cursor
             }
-            if (packet.keycode[0] == 0x4F && input_col < 132 && input_buffer[input_col - 2] != '\0')
-            { // Right Arrow (0x4F)
-                fbputchar(input_buffer[input_col - 2], input_row, input_col);  // 🔹 Restore original character
-                input_col++;  // 🔹 Move right
-                draw_cursor(input_row, input_col, input_buffer);  // 🔹 Redraw cursor at new position
+
+            // Right Arrow Key (0x4F)
+            if (packet.keycode[0] == 0x4F) { 
+                if (input_col < 131) {  
+                    input_col++;  // Move right within the row
+                } 
+                else if (input_col == 131 && input_row == 43) {  
+                    input_row = 44;  // Move down to row 44
+                    input_col = 0;   // Start at column 0
+                }
+
+                fbputchar(input_buffer[input_col], input_row, input_col); // Restore character
+                draw_cursor(input_row, input_col, input_buffer); // Update cursor
             }
+
             
             // Handle Enter (0x28)
             if (packet.keycode[0] == 0x28)
