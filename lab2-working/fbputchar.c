@@ -16,7 +16,7 @@
 struct fb_var_screeninfo fb_vinfo;
 struct fb_fix_screeninfo fb_finfo;
 unsigned char *framebuffer;
-static char input_buffer[128];
+static char input_buffer[132];
 static unsigned char font[] = {
   0x00, 0x00, 0x7e, 0xc3, 0x99, 0x99, 0xf3, 0xe7, 0xe7, 0xff, 0xe7, 0xe7, 0x7e, 0x00, 0x00, 0x00,
   0x00, 0x00, 0x00, 0x00, 0x00, 0x76, 0xdc, 0x00, 0x76, 0xdc, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -228,46 +228,19 @@ void scroll_text_up() {
 }
 
 void draw_cursor(int row, int col, char *input_buffer) {
-    static int prev_row = 43, prev_col = 0;
+    static int prev_row = 43, prev_col = 2;
 
-    // Restore the previous character
-    if (prev_col >= 0) {
-        int restore_row = prev_row;
-        int restore_col = prev_col;
-
-        // Adjust row transition logic for multiline text
-        if (prev_col >= 132) {
-            restore_col = prev_col - 132;
-            restore_row = 44;
-        } 
-        else if (prev_col < 0 && prev_row == 44) {
-            restore_col = 131;
-            restore_row = 43;
-        }
-
-        fbputchar(input_buffer[restore_col] ? input_buffer[restore_col] : ' ', restore_row, restore_col);
-    }
-
-    // Handle row transitions when moving right
-    if (col >= 132 && row == 43) {
-        row = 44;
-        col = 0;
-    } 
-
-    // Handle row transitions when moving left
-    if (col < 0 && row == 44) {
-        row = 43;
-        col = 131;
+    // Restore previous character instead of drawing cursor in the buffer
+    if (prev_col >= 2) {
+        fbputchar(input_buffer[prev_col - 2] ? input_buffer[prev_col - 2] : ' ', prev_row, prev_col);
     }
 
     // Draw cursor but do NOT modify input_buffer
     fbputchar('_', row, col);
 
-    // Update previous position
     prev_row = row;
     prev_col = col;
 }
-
 
 
 
