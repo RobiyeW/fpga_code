@@ -16,7 +16,7 @@
 
 #define SERVER_HOST "128.59.19.114"
 #define SERVER_PORT 42000
-#define BUFFER_SIZE 128
+#define BUFFER_SIZE 264
 
 int sockfd;
 struct libusb_device_handle *keyboard;
@@ -78,7 +78,7 @@ char keycode_to_ascii(uint8_t keycode, uint8_t modifiers)
     default:
         // Log the unknown keycode for debugging
         printf("Unknown keycode: 0x%X\n", keycode);
-        return 0;
+        return 0
     }
 }
 
