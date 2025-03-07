@@ -232,19 +232,30 @@ void draw_cursor(int row, int col, char *input_buffer) {
 
     // Restore previous character instead of drawing cursor in the buffer
     if (prev_col >= 2) {
-        fbputchar(input_buffer[prev_col - 2] ? input_buffer[prev_col - 2] : ' ', prev_row, prev_col);
+        int buffer_index = (prev_row == 43) ? prev_col - 2 : prev_col - 2 + 132;
+        fbputchar(input_buffer[buffer_index] ? input_buffer[buffer_index] : ' ', prev_row, prev_col);
     }
 
-    if (input_buffer >= 132) {
-        fbputchar('_', row+1, col++);
+    // Handle cursor movement to row 44 when exceeding col 131
+    if (col >= 132 && row == 43) {
+        row = 44;
+        col = 0;
     }
 
-    // Draw cursor but do NOT modify input_buffer
-    fbputchar('_', row, col++);
+    // Handle cursor movement back to row 43 when moving left past col 0 in row 44
+    if (col < 0 && row == 44) {
+        row = 43;
+        col = 131;
+    }
 
+    // Draw cursor at the correct position
+    fbputchar('_', row, col);
+
+    // Update previous position
     prev_row = row;
     prev_col = col;
 }
+
 
 
 
