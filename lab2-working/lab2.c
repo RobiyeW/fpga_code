@@ -140,13 +140,14 @@ int main()
     int transferred, input_col = 2, input_row = 43;
     char input_buffer[BUFFER_SIZE] = {0};
 
-    // for (col = 0; col < 130; col++)
-    // {
-    //     fbputchar('*', 33, col);
-    // }
-
     fbopen();
     fbclear();
+
+    for (col = 0; col < 130; col++)
+    {
+        fbputchar('*', 33, col);
+    }
+
     fbputs("> ", 43, 0);
 
     keyboard = openkeyboard(&endpoint_address);
