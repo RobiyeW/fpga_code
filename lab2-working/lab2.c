@@ -60,7 +60,7 @@ char keycode_to_ascii(uint8_t keycode, uint8_t modifiers)
         return '\b'; // Backspace
     case 0x28:
         return '\n'; // Enter
-    case 0x2B:
+    case 0x2b:
         return '\t'; // Tab
     case 0x2C:
         return ' '; // Space
