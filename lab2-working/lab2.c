@@ -23,7 +23,7 @@ struct libusb_device_handle *keyboard;
 uint8_t endpoint_address;
 pthread_t network_thread, cursor_thread;
 void *network_thread_f(void *);
-void *cursor_blink_thread(void *);
+void *draw_cursor_thread(void *);
 
 char keycode_to_ascii(uint8_t keycode, uint8_t modifiers)
 {
