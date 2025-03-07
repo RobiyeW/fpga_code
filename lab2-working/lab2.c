@@ -142,6 +142,9 @@ int main()
     int transferred, input_col = 2, input_row = 43;
     char input_buffer[BUFFER_SIZE] = {0};
 
+    // for (col = 0; col < 132; col++) {
+    //     fbputchar('*', 42, col);
+    // }
 
     fbopen();
     fbclear();
@@ -165,50 +168,44 @@ int main()
 
     for (;;)
     {
-        int status = libusb_interrupt_transfer(keyboard, endpoint_address, 
-            (unsigned char *)&packet, sizeof(packet), 
-            &transferred, 0);
-        if (status != 0) {
-        printf("USB Transfer Error: %d\n", status);
-        }
-
-        if (transferred == sizeof(packet))
-        {
-        printf("Raw USB Data: Keycode[0]=0x%X Modifiers=0x%X\n", packet.keycode[0], packet.modifiers);
-        char c = keycode_to_ascii(packet.keycode[0], packet.modifiers);
-        if (c) {
-        printf("Recognized character: %c\n", c);
-        }
-        }
+        libusb_interrupt_transfer(keyboard, endpoint_address, (unsigned char *)&packet, sizeof(packet), &transferred, 0);
         if (transferred == sizeof(packet))
         {
             char c = keycode_to_ascii(packet.keycode[0], packet.modifiers);
-            if (c && input_col - 2 < BUFFER_SIZE - 1)
-            { // 🔹 Ensure character is stored BEFORE moving cursor
-                input_buffer[input_col - 2] = c;  
+            if (c && strlen(input_buffer) < BUFFER_SIZE - 1)
+            { 
+                // Store character in buffer
+                input_buffer[strlen(input_buffer)] = c;
+                
+                // Print character on screen
                 fbputchar(c, input_row, input_col);
                 input_col++;
-                draw_cursor(input_row, input_col);  // 🔹 Update cursor immediately
-            }
-            
 
-            if (packet.keycode[0] == 0x2A && strlen(input_buffer) > 0) {
+                // Wrap to next line when reaching column limit (assume 132 columns)
+                if (input_col >= 132)
+                {
+                    input_col = 0; // Reset column to beginning
+                    input_row = 44; // Move cursor to the second row
+                }
+
+                draw_cursor(input_row, input_col, input_buffer);
+            }
+
+            // Handle backspace (0x2A)
+            if (packet.keycode[0] == 0x2A && strlen(input_buffer) > 0)
+            {
                 input_col--;
-            
-                // Handle transition from row 44 to row 43
-                if (input_col < 0 && input_row == 44) {
-                    input_col = 131;
+
+                if (input_col < 0)  // Move cursor back to previous row if needed
+                {
+                    input_col = 132; // Move to last column of previous row
                     input_row = 43;
                 }
-            
-                // Remove from buffer
-                int buffer_index = (input_row == 43) ? input_col : input_col + 132;
-                input_buffer[buffer_index] = '\0';
-            
+
                 fbputchar(' ', input_row, input_col); // Clear character visually
-                draw_cursor(input_row, input_col);
+                input_buffer[strlen(input_buffer) - 1] = '\0'; // Remove from buffer
+                draw_cursor(input_row, input_col, input_buffer);
             }
-            
             
             if ((packet.keycode[0] == 0x2B || packet.keycode[0] == 0x43)) { // Tab Key
                 int spaces_to_add = 4;
@@ -219,15 +216,10 @@ int main()
                     for (int i = 0; i < remaining_in_row; i++) {
                         fbputchar(' ', input_row, input_col);
                         input_col++;
-                        fbputchar(' ', input_row, input_col);
-                        input_col++;
-                        fbputchar(' ', input_row, input_col);
-                        input_col++;
-                        fbputchar(' ', input_row, input_col);
-                        input_col++;
                     }
                     input_col = 0;
                     input_row = 44;
+                    spaces_to_add -= remaining_in_row; // Reduce remaining spaces
                 }
             
                 // Apply remaining tab spaces (ensure we don't exceed column 132 in row 44)
@@ -236,65 +228,37 @@ int main()
                     input_col++;
                 }
             
-                draw_cursor(input_row, input_col);
+                draw_cursor(input_row, input_col, input_buffer);
             }
             
     
-            // Left Arrow Key (0x50)
-            if (packet.keycode[0] == 0x50) {
-                if (input_col > 0) {  
-                    input_col--;  // Move left within the row
-                } 
-                else if (input_col == 0 && input_row == 44) {  
-                    input_row = 43;  // Move up to row 43
-                    input_col = 131; // Move to last column of row 43
-                }
-
-                fbputchar(input_buffer[input_col], input_row, input_col); // Restore character
-                draw_cursor(input_row, input_col);
-
+            if (packet.keycode[0] == 0x50 && input_col > 2)
+            { // Left Arrow (0x50)
+                fbputchar(input_buffer[input_col - 2], input_row, input_col);  // 🔹 Restore original character
+                input_col--;  // 🔹 Move left
+                draw_cursor(input_row, input_col, input_buffer);  // 🔹 Redraw cursor at new position
             }
-
-            // Right Arrow Key (0x4F)
-            if (packet.keycode[0] == 0x4F) { 
-                if (input_col < 131) {  
-                    input_col++;  // Move right within the row
-                } 
-                else if (input_col == 131 && input_row == 43) {  
-                    input_row = 44;  // Move down to row 44
-                    input_col = 0;   // Start at column 0
-                }
-
-                fbputchar(input_buffer[input_col], input_row, input_col); // Restore character
-                draw_cursor(input_row, input_col);
+            if (packet.keycode[0] == 0x4F && input_col < 132 && input_buffer[input_col - 2] != '\0')
+            { // Right Arrow (0x4F)
+                fbputchar(input_buffer[input_col - 2], input_row, input_col);  // 🔹 Restore original character
+                input_col++;  // 🔹 Move right
+                draw_cursor(input_row, input_col, input_buffer);  // 🔹 Redraw cursor at new position
             }
-
             
-            if (packet.keycode[0] == 0x28) {
-                char message_to_send[264] = {0};  // Buffer for entire message
-            
-                if (input_row == 43) {
-                    strncpy(message_to_send, input_buffer, 132);
-                } else if (input_row == 44) {
-                    snprintf(message_to_send, 264, "%s%s", input_buffer, &input_buffer[132]);
-                }
-            
-                send(sockfd, message_to_send, strlen(message_to_send), 0);
-                display_received_message(message_to_send);
-            
+            // Handle Enter (0x28)
+            if (packet.keycode[0] == 0x28)
+            {
+                send(sockfd, input_buffer, strlen(input_buffer), 0);
+                display_received_message(input_buffer);
                 memset(input_buffer, 0, sizeof(input_buffer));
                 fbclear_input_area();
                 fbputs("> ", 43, 0);
-            
-                input_col = 1;
-                input_row = 43;
+                input_col = 0;
+                input_row = 43; // Reset cursor to first input row
             }
             
-
-
-            
             usleep(10000); // 🔹 Small delay to ensure rendering catches up
-            draw_cursor(input_row, input_col);
+            draw_cursor(input_row, input_col, input_buffer);
             
         }
     }
