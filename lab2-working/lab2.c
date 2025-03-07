@@ -134,12 +134,12 @@ int main()
 {
     struct sockaddr_in serv_addr;
     struct usb_keyboard_packet packet;
-    int transferred, input_col = 2, input_row = 43;
+    int transferred, input_col = 2, input_row = 42;
     char input_buffer[BUFFER_SIZE] = {0};
 
     fbopen();
     fbclear();
-    fbputs("> ", 43, 0);
+    fbputs("> ", 42, 0);
 
     keyboard = openkeyboard(&endpoint_address);
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
@@ -200,7 +200,7 @@ int main()
                 display_received_message(input_buffer);
                 memset(input_buffer, 0, sizeof(input_buffer));
                 fbclear_input_area();
-                fbputs("> ", 43, 0);
+                fbputs("> ", 42, 0);
                 input_col = 2;
             }
 
