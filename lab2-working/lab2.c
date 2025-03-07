@@ -18,7 +18,7 @@
 #define SERVER_PORT 42000
 #define BUFFER_SIZE 128
 #define MAX_COL 131
-#define MAX_ROW 43
+#define MAX_ROW 44
 
 int sockfd;
 struct libusb_device_handle *keyboard;
@@ -175,9 +175,9 @@ int main()
             if ((packet.keycode[0] == 0x2A || packet.keycode[0] == 0x42) && input_col > 2)
             {
 <<<<<<< HEAD
-                input_col--;                          //
-=======
-                input_col--;
+                input_col--; //
+                == == == =
+                             input_col--;
 >>>>>>> 45cee3c5156072fd06af4dcc49aa0bd2733cdc80
                 fbputchar(' ', input_row, input_col); // Clear character from framebuffer
                 input_buffer[input_col - 2] = '\0';   // Remove from buffer safely
@@ -185,16 +185,16 @@ int main()
 
 <<<<<<< HEAD
             if ((packet.keycode[0] == 0x2B || packet.keycode[0] == 0x43) && input_col < 132)
-=======
-            if ((packet.keycode[0] == 0x2B || packet.keycode[0] == 0x43) && input_col < 130)
+                == == == =
+                             if ((packet.keycode[0] == 0x2B || packet.keycode[0] == 0x43) && input_col < 130)
 >>>>>>> 45cee3c5156072fd06af4dcc49aa0bd2733cdc80
-            { // Tab (0x43) - Moves cursor forward 4 spaces
-                for (int i = 0; i < 4; i++)
-                {
-                    fbputchar(' ', input_row, input_col);
-                    input_col++;
+                { // Tab (0x43) - Moves cursor forward 4 spaces
+                    for (int i = 0; i < 4; i++)
+                    {
+                        fbputchar(' ', input_row, input_col);
+                        input_col++;
+                    }
                 }
-            }
 
             if (packet.keycode[0] == 0x50 && input_col > 2)
             {                                                                 // Left Arrow (0x50)
@@ -213,8 +213,8 @@ int main()
             {                                       // Enter key
 <<<<<<< HEAD
                 input_buffer[input_col - 2] = '\0'; // ✅ Ensure cursor is removed before sending
-=======
-                input_buffer[input_col - 3] = '\0'; // ✅ Ensure cursor is removed before sending
+                == == == =
+                             input_buffer[input_col - 3] = '\0'; // ✅ Ensure cursor is removed before sending
 >>>>>>> 45cee3c5156072fd06af4dcc49aa0bd2733cdc80
                 send(sockfd, input_buffer, strlen(input_buffer), 0);
                 display_received_message(input_buffer);
@@ -225,10 +225,10 @@ int main()
             }
 <<<<<<< HEAD
 
-=======
-            // <<<<<<< HEAD
-            // test///////////////////////////////////
-            if (c && input_col >= 2 && input_col - 2 < BUFFER_SIZE - 1)
+            == == == =
+                         // <<<<<<< HEAD
+                         // test///////////////////////////////////
+                if (c && input_col >= 2 && input_col - 2 < BUFFER_SIZE - 1)
             {
                 input_buffer[input_col - 2] = c;    // Store character in buffer
                 fbputchar(c, input_row, input_col); // Display character
