@@ -228,12 +228,12 @@ void scroll_text_up() {
            fb_finfo.line_length * FONT_HEIGHT);
 }
 
-void draw_cursor(int row, int col, char *input_buffer) {
+void draw_cursor(int row, int col) {
     static int prev_row = 23, prev_col = 2;  
     static int blink_state = 1;
 
     while (1) {  // Continuous blinking loop
-        // Restore character at previous cursor position
+        // Restore previous character from input_buffer
         if (prev_col >= 2) {
             fbputchar(input_buffer[prev_col - 2] ? input_buffer[prev_col - 2] : ' ', prev_row, prev_col);
         }
@@ -252,6 +252,19 @@ void draw_cursor(int row, int col, char *input_buffer) {
 
         usleep(500000); // 500ms delay for blinking
     }
+}
+
+// Function to store character in input buffer
+void store_input_char(int col, char c) {
+    if (col - 2 < 127) {  // Avoid buffer overflow
+        input_buffer[col - 2] = c;
+        input_buffer[col - 1] = '\0'; // Null-terminate
+    }
+}
+
+// Function to clear input buffer
+void clear_input_buffer() {
+    memset(input_buffer, 0, sizeof(input_buffer));
 }
 
 
