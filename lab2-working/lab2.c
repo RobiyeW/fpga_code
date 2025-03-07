@@ -56,11 +56,11 @@ char keycode_to_ascii(uint8_t keycode, uint8_t modifiers)
     // Handle special keys like Backspace, Tab, Space, Enter, etc.
     switch (keycode)
     {
-    case 0x42:
+    case 0x2A:
         return '\b'; // Backspace
     case 0x28:
         return '\n'; // Enter
-    case 0x43:
+    case 0x2B:
         return '\t'; // Tab
     case 0x2C:
         return ' '; // Space
@@ -86,71 +86,7 @@ char keycode_to_ascii(uint8_t keycode, uint8_t modifiers)
 
 
 
-//////////////// working code/////////////////
-// char keycode_to_ascii(uint8_t keycode, uint8_t modifiers)
-// {
-//     // Properly indexed keymaps for standard and shifted keys
-//     static const char keymap[] = {
-//         0, 0, 0, 0,                                       // Keycodes 0-3 (unused)
-//         'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', // 4-13
-//         'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', // 14-23
-//         'u', 'v', 'w', 'x', 'y', 'z', '1', '2', '3', '4', // 24-33
-//         '5', '6', '7', '8', '9', '0', '-', '=', '[', ']', // 34-43
-//         '\\', ';', '\'', '`', ',', '.', '/', ' '          // 44-50 (Space at 50)
-//     };
 
-//     static const char shift_keymap[] = {
-//         0, 0, 0, 0,
-//         'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', // 4-13
-//         'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', // 14-23
-//         'U', 'V', 'W', 'X', 'Y', 'Z', '!', '@', '#', '$', // 24-33
-//         '%', '^', '&', '*', '(', ')', '_', '+', '{', '}', // 34-43
-//         '|', ':', '"', '~', '<', '>', '?', ' '            // 44-50 (Space at 50)
-//     };
-
-//     if (keycode >= 4 && keycode <= 50)
-//     {
-//         return (modifiers & (USB_LSHIFT | USB_RSHIFT)) ? shift_keymap[keycode] : keymap[keycode];
-//     }
-
-//     // Handle special keys separately
-//     switch (keycode)
-//     {
-//     case 0x2B:
-//         return '\t'; // Tab
-//     case 0x2C:
-//         return ' '; // Space
-//     case 0x28:
-//         return '\n'; // Enter
-//     case 0x2A:
-//         return '\b'; // Backspace
-//     default:
-//         return 0;
-//     }
-// }
-
-// char keycode_to_ascii(uint8_t keycode, uint8_t modifiers)
-// {
-//     // Standard QWERTY mapping based on USB HID keycodes
-//     const char keymap[] = {
-//         0, 0, 0, 0, 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
-//         'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
-//         '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '\n', '\b', '\t', ' ', '-', '=',
-//         '[', ']', '\\', ';', '\'', '`', ',', '.', '/'};
-
-//     const char shift_keymap[] = {
-//         0, 0, 0, 0, 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
-//         'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
-//         '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '\n', '\b', '\t', ' ', '_', '+',
-//         '{', '}', '|', ':', '"', '~', '<', '>', '?'};
-
-//     // Ensure keycode is within bounds
-//     if (keycode < 4 || keycode > 53)
-//         return 0;
-
-//     // Use shift map if Shift key is held
-//     return (modifiers & (USB_LSHIFT | USB_RSHIFT)) ? shift_keymap[keycode - 4] : keymap[keycode - 4];
-// }
 
 void *network_thread_f(void *ignored)
 {
@@ -217,12 +153,21 @@ int main()
                 input_buffer[input_col - 2] = c;
                 input_col++;
             }
-            if (packet.keycode[0] == 0x2A && input_col > 2)
-            { // Backspace
+            if ((packet.keycode[0] == 0x2A || packet.keycode[0] == 0x42) && input_col > 2)
+            { // Backspace (0x2A or 0x42)
                 input_col--;
                 fbputchar(' ', input_row, input_col);
                 input_buffer[input_col - 2] = '\0';
             }
+            if ((packet.keycode[0] == 0x2B || packet.keycode[0] == 0x43) && input_col < 60)
+            { // Tab (0x43) - Moves cursor forward 4 spaces
+                for (int i = 0; i < 4; i++)
+                {
+                    fbputchar(' ', input_row, input_col);
+                    input_col++;
+                }
+            }
+    
             if (packet.keycode[0] == 0x50 && input_col > 2)
             { // Left Arrow
                 input_col--;
