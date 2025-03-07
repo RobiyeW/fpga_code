@@ -216,35 +216,35 @@ int main()
                 input_col = 2;
             }
 
-            if (c && input_col >= 2 && input_col - 2 < BUFFER_SIZE - 1)
-            {
-                input_buffer[input_col - 2] = c;    // Store character in buffer
-                fbputchar(c, input_row, input_col); // Display character
-                input_col++;                        // Move cursor right
+            // if (c && input_col >= 2 && input_col - 2 < BUFFER_SIZE - 1)
+            // {
+            //     input_buffer[input_col - 2] = c;    // Store character in buffer
+            //     fbputchar(c, input_row, input_col); // Display character
+            //     input_col++;                        // Move cursor right
 
-                // Wrap-around logic: if we've reached the right edge of the screen,
-                // reset the column (accounting for the prompt) and move down one row.
-                if (input_col >= MAX_COL)
-                {
-                    input_col = 2; // Reset to starting column (after prompt)
-                    input_row++;   // Move down one line
+            //     // Wrap-around logic: if we've reached the right edge of the screen,
+            //     // reset the column (accounting for the prompt) and move down one row.
+            //     if (input_col >= MAX_COL)
+            //     {
+            //         input_col = 2; // Reset to starting column (after prompt)
+            //         input_row++;   // Move down one line
 
-                    // Handle bottom-of-screen behavior
-                    if (input_row >= MAX_ROW)
-                    {
-                        input_row = MAX_ROW - 1; // Stay at the last row
+            //         // Handle bottom-of-screen behavior
+            //         if (input_row >= MAX_ROW)
+            //         {
+            //             input_row = MAX_ROW - 1; // Stay at the last row
 
-                        // Optional: Scroll the screen if implemented
-                        // scroll_screen();
-                    }
-                }
+            //             // Optional: Scroll the screen if implemented
+            //             // scroll_screen();
+            //         }
+            //     }
 
-                // Ensure cursor position is valid before updating
-                if (input_col >= 2 && input_col < MAX_COL && input_row < MAX_ROW)
-                {
-                    draw_cursor(input_row, input_col, input_buffer); // Update the cursor position
-                }
-            }
+            //     // Ensure cursor position is valid before updating
+            //     if (input_col >= 2 && input_col < MAX_COL && input_row < MAX_ROW)
+            //     {
+            //         draw_cursor(input_row, input_col, input_buffer); // Update the cursor position
+            //     }
+            // }
 
             usleep(10000); // 🔹 Small delay to ensure rendering catches up
             draw_cursor(input_row, input_col, input_buffer);
