@@ -187,7 +187,7 @@ int main() {
             }
 
             if (packet.keycode[0] == 0x28) { // Enter key
-                if (input_col > 2) {  // Only process if there is user input
+                if (cursor_col > 2) {  // Only process if there is user input
                     input_buffer[input_length] = '\0';  // ✅ Ensure input is null-terminated before sending
                     send(sockfd, input_buffer, strlen(input_buffer), 0); // ✅ Send only the typed characters
                     display_received_message(input_buffer);  // ✅ Display message in UI
@@ -195,7 +195,7 @@ int main() {
                     // ✅ Reset input buffer and cursor after sending
                     memset(input_buffer, 0, sizeof(input_buffer));
                     input_length = 0;
-                    input_col = 2;
+                    cursor_col = 2;
                     cursor_row = 43;
                     fbclear_input_area();  
                     fbputs("> ", 43, 0);  // ✅ Display prompt for new input
