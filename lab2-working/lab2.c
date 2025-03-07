@@ -104,6 +104,7 @@ int main()
     struct sockaddr_in serv_addr;
     struct usb_keyboard_packet packet;
     int transferred, input_col = 2, input_row = 23;
+    char input_buffer[BUFFER_SIZE] = {0};
 
     fbopen();
     fbclear();
@@ -117,10 +118,7 @@ int main()
     connect(sockfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr));
 
     pthread_create(&network_thread, NULL, network_thread_f, NULL);
-
-    // Start the cursor blinking
-    pthread_t cursor_thread;
-    pthread_create(&cursor_thread, NULL, draw_cursor_thread, NULL);
+    pthread_create(&cursor_thread, NULL, (void *(*)(void *))draw_cursor, (void *)input_buffer);
     pthread_detach(cursor_thread);
     
 
@@ -135,16 +133,17 @@ int main()
                 store_input_char(input_col, c);  // 🔹 Store in `fbputchar.c`'s buffer
                 fbputchar(c, input_row, input_col);
                 input_col++;
+                draw_cursor(input_row, input_col, input_buffer);  // 🔹 Update cursor immediately
             }
             if ((packet.keycode[0] == 0x2A || packet.keycode[0] == 0x42) && input_col > 2)
-            { 
+            {
                 input_col--;
                 fbputchar(' ', input_row, input_col);
                 store_input_char(input_col, '\0');  // 🔹 Remove character
             }
             
             if ((packet.keycode[0] == 0x2B || packet.keycode[0] == 0x43) && input_col < 60)
-            { 
+            { // Tab (0x43) - Moves cursor forward 4 spaces
                 for (int i = 0; i < 4; i++)
                 {
                     fbputchar(' ', input_row, input_col);
@@ -178,8 +177,9 @@ int main()
                 fbputs("> ", 23, 0);
                 input_col = 2;
             }
-
-            usleep(10000); // Small delay to ensure rendering catches up
+            usleep(10000); // 🔹 Small delay to ensure rendering catches up
+            draw_cursor(input_row, input_col, input_buffer);
+            
         }
     }
 
