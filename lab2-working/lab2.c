@@ -148,6 +148,12 @@ int main()
 
     fbopen();
     fbclear();
+
+    for (col = 0; col < 130; col++)
+    {
+        fbputchar('*', 41, col);
+    }
+
     fbputs("> ", 43, 0);
 
     keyboard = openkeyboard(&endpoint_address);
