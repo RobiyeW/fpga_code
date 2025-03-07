@@ -34,7 +34,7 @@ char keycode_to_ascii(uint8_t keycode, uint8_t modifiers)
         'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', // 14-23
         'u', 'v', 'w', 'x', 'y', 'z', '1', '2', '3', '4', // 24-33
         '5', '6', '7', '8', '9', '0', '-', '=', '[', '\t', // 34-43
-        ' ', '-', '=', '`', ']', '\', '/', ' '          // 44-50 (Space at 50)
+        ' ', '-', '=', '`', ']', '\\', '/', ' '          // 44-50 (Space at 50)
     };
 
     static const char shift_keymap[] = {
@@ -60,10 +60,10 @@ char keycode_to_ascii(uint8_t keycode, uint8_t modifiers)
         return '\b'; // Backspace
     case 0x28:
         return '\n'; // Enter
-    case 0x2d:
-        return '-';
-    case 0x2e:
-        return '=';
+    // case 0x2d:
+    //     return '-';
+    // case 0x2e:
+    //     return '=';
     case 0x34:
         return '"';
     case 0x36:
