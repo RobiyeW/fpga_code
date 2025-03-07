@@ -216,11 +216,7 @@ int main()
                 fbputs("> ", 43, 0);
                 input_col = 2;
             }
-            // <<<<<<< HEAD
 
-            // == == == =
-            //              // <<<<<<< HEAD
-            //              // test///////////////////////////////////
             if (c && input_col >= 2 && input_col - 2 < BUFFER_SIZE - 1)
             {
                 input_buffer[input_col - 2] = c;    // Store character in buffer
@@ -250,10 +246,6 @@ int main()
                 }
             }
 
-            // == == == =
-
-            // >>>>>>> 7e6f00d353ef0e74049896b53bd1625c93cb9b15
-            // >>>>>>> 45cee3c5156072fd06af4dcc49aa0bd2733cdc80
             usleep(10000); // 🔹 Small delay to ensure rendering catches up
             draw_cursor(input_row, input_col, input_buffer);
         }
