@@ -175,7 +175,7 @@ int main()
                 input_buffer[input_col - 2] = '\0';   // Remove from buffer safely
             }
             
-            if ((packet.keycode[0] == 0x2B || packet.keycode[0] == 0x43) && input_col < 130)
+            if ((packet.keycode[0] == 0x2B || packet.keycode[0] == 0x43) && input_col < 132)
             { // Tab (0x43) - Moves cursor forward 4 spaces
                 for (int i = 0; i < 4; i++)
                 {
@@ -197,8 +197,8 @@ int main()
                 draw_cursor(input_row, input_col, input_buffer);  // 🔹 Redraw cursor at new position
             }
             
-            if (packet.keycode[0] == 0x28)
-            { // Enter
+            if (packet.keycode[0] == 0x28) { // Enter key
+                input_buffer[input_col - 2] = '\0';  // ✅ Ensure cursor is removed before sending
                 send(sockfd, input_buffer, strlen(input_buffer), 0);
                 display_received_message(input_buffer);
                 memset(input_buffer, 0, sizeof(input_buffer));
@@ -206,6 +206,7 @@ int main()
                 fbputs("> ", 43, 0);
                 input_col = 2;
             }
+            
             usleep(10000); // 🔹 Small delay to ensure rendering catches up
             draw_cursor(input_row, input_col, input_buffer);
             

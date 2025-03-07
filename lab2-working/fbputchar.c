@@ -228,20 +228,20 @@ void scroll_text_up() {
 }
 
 void draw_cursor(int row, int col, char *input_buffer) {
-    static int prev_row = 43, prev_col = 2;  // 🔹 Keep track of previous position
+    static int prev_row = 43, prev_col = 2;
 
-    // 🔹 Restore character at old cursor position
+    // Restore previous character instead of drawing cursor in the buffer
     if (prev_col >= 2) {
         fbputchar(input_buffer[prev_col - 2] ? input_buffer[prev_col - 2] : ' ', prev_row, prev_col);
     }
 
-    // 🔹 Draw new cursor
+    // Draw cursor but do NOT modify input_buffer
     fbputchar('_', row, col);
 
-    // 🔹 Update previous position
     prev_row = row;
     prev_col = col;
 }
+
 
 
 
