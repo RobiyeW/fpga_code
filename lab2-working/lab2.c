@@ -17,6 +17,8 @@
 #define SERVER_HOST "128.59.19.114"
 #define SERVER_PORT 42000
 #define BUFFER_SIZE 128
+#define MAX_COL 131
+#define MAX_ROW 43
 
 int sockfd;
 struct libusb_device_handle *keyboard;
@@ -132,10 +134,16 @@ void *network_thread_f(void *ignored)
 
 int main()
 {
+    int col;
     struct sockaddr_in serv_addr;
     struct usb_keyboard_packet packet;
     int transferred, input_col = 2, input_row = 42;
     char input_buffer[BUFFER_SIZE] = {0};
+
+    for (col = 0; col < 130; col++)
+    {
+        fbputchar('*', 42, col);
+    }
 
     fbopen();
     fbclear();
@@ -166,12 +174,20 @@ int main()
             }
             if ((packet.keycode[0] == 0x2A || packet.keycode[0] == 0x42) && input_col > 2)
             {
+<<<<<<< HEAD
                 input_col--;                          //
+=======
+                input_col--;
+>>>>>>> 45cee3c5156072fd06af4dcc49aa0bd2733cdc80
                 fbputchar(' ', input_row, input_col); // Clear character from framebuffer
                 input_buffer[input_col - 2] = '\0';   // Remove from buffer safely
             }
 
+<<<<<<< HEAD
             if ((packet.keycode[0] == 0x2B || packet.keycode[0] == 0x43) && input_col < 132)
+=======
+            if ((packet.keycode[0] == 0x2B || packet.keycode[0] == 0x43) && input_col < 130)
+>>>>>>> 45cee3c5156072fd06af4dcc49aa0bd2733cdc80
             { // Tab (0x43) - Moves cursor forward 4 spaces
                 for (int i = 0; i < 4; i++)
                 {
@@ -195,7 +211,11 @@ int main()
 
             if (packet.keycode[0] == 0x28)
             {                                       // Enter key
+<<<<<<< HEAD
                 input_buffer[input_col - 2] = '\0'; // ✅ Ensure cursor is removed before sending
+=======
+                input_buffer[input_col - 3] = '\0'; // ✅ Ensure cursor is removed before sending
+>>>>>>> 45cee3c5156072fd06af4dcc49aa0bd2733cdc80
                 send(sockfd, input_buffer, strlen(input_buffer), 0);
                 display_received_message(input_buffer);
                 memset(input_buffer, 0, sizeof(input_buffer));
@@ -203,7 +223,44 @@ int main()
                 fbputs("> ", 42, 0);
                 input_col = 2;
             }
+<<<<<<< HEAD
 
+=======
+            // <<<<<<< HEAD
+            // test///////////////////////////////////
+            if (c && input_col >= 2 && input_col - 2 < BUFFER_SIZE - 1)
+            {
+                input_buffer[input_col - 2] = c;    // Store character in buffer
+                fbputchar(c, input_row, input_col); // Display character
+                input_col++;                        // Move cursor right
+
+                // Wrap-around logic: if we've reached the right edge of the screen,
+                // reset the column (accounting for the prompt) and move down one row.
+                if (input_col >= MAX_COL)
+                {
+                    input_col = 2; // Reset to starting column (after prompt)
+                    input_row++;   // Move down one line
+
+                    // If we exceed the bottom of the display, handle scrolling or cap the row.
+                    if (input_row >= MAX_ROW)
+                    {
+                        input_row = MAX_ROW - 1; // Adjust to keep the cursor in bounds
+                        // Optional: Implement scrolling if desired
+                        // scroll_screen();
+                    }
+                }
+
+                // Ensure cursor position is valid before updating
+                if (input_col >= 2 && input_col < MAX_COL && input_row < MAX_ROW)
+                {
+                    draw_cursor(input_row, input_col, input_buffer); // Update the cursor position
+                }
+            }
+
+            // == == == =
+
+            // >>>>>>> 7e6f00d353ef0e74049896b53bd1625c93cb9b15
+>>>>>>> 45cee3c5156072fd06af4dcc49aa0bd2733cdc80
             usleep(10000); // 🔹 Small delay to ensure rendering catches up
             draw_cursor(input_row, input_col, input_buffer);
         }
