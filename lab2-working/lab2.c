@@ -17,8 +17,6 @@
 #define SERVER_HOST "128.59.19.114"
 #define SERVER_PORT 42000
 #define BUFFER_SIZE 128
-#define MAX_COL 131
-#define MAX_ROW 44
 
 int sockfd;
 struct libusb_device_handle *keyboard;
@@ -134,7 +132,6 @@ void *network_thread_f(void *ignored)
 
 int main()
 {
-    int col;
     struct sockaddr_in serv_addr;
     struct usb_keyboard_packet packet;
     int transferred, input_col = 2, input_row = 43;
@@ -142,11 +139,6 @@ int main()
 
     fbopen();
     fbclear();
-
-    for (col = 0; col < 130; col++)
-    {
-        fbputchar('*', 40, col);
-    }
     fbputs("> ", 43, 0);
 
     keyboard = openkeyboard(&endpoint_address);
@@ -174,19 +166,19 @@ int main()
             }
             if ((packet.keycode[0] == 0x2A || packet.keycode[0] == 0x42) && input_col > 2)
             {
+                input_col--;
                 fbputchar(' ', input_row, input_col); // Clear character from framebuffer
                 input_buffer[input_col - 2] = '\0';   // Remove from buffer safely
-                input_col--;
             }
+
             if ((packet.keycode[0] == 0x2B || packet.keycode[0] == 0x43) && input_col < 132)
-                if ((packet.keycode[0] == 0x2B || packet.keycode[0] == 0x43) && input_col < 130)
-                { // Tab (0x43) - Moves cursor forward 4 spaces
-                    for (int i = 0; i < 4; i++)
-                    {
-                        fbputchar(' ', input_row, input_col);
-                        input_col++;
-                    }
+            { // Tab (0x43) - Moves cursor forward 4 spaces
+                for (int i = 0; i < 4; i++)
+                {
+                    fbputchar(' ', input_row, input_col);
+                    input_col++;
                 }
+            }
 
             if (packet.keycode[0] == 0x50 && input_col > 2)
             {                                                                 // Left Arrow (0x50)
@@ -204,43 +196,12 @@ int main()
             if (packet.keycode[0] == 0x28)
             {                                       // Enter key
                 input_buffer[input_col - 2] = '\0'; // ✅ Ensure cursor is removed before sending
-                input_buffer[input_col - 3] = '\0'; // ✅ Ensure cursor is removed before sending
                 send(sockfd, input_buffer, strlen(input_buffer), 0);
                 display_received_message(input_buffer);
                 memset(input_buffer, 0, sizeof(input_buffer));
                 fbclear_input_area();
                 fbputs("> ", 43, 0);
                 input_col = 2;
-            }
-
-            if (c && input_col >= 2 && input_col - 2 < BUFFER_SIZE - 1)
-            {
-                input_buffer[input_col - 2] = c;    // Store character in buffer
-                fbputchar(c, input_row, input_col); // Display character
-                input_col++;                        // Move cursor right
-
-                // Wrap-around logic: if we've reached the right edge of the screen,
-                // reset the column (accounting for the prompt) and move down one row.
-                if (input_col >= MAX_COL)
-                {
-                    input_col = 2; // Reset to starting column (after prompt)
-                    input_row++;   // Move down one line
-
-                    // Handle bottom-of-screen behavior
-                    if (input_row >= MAX_ROW)
-                    {
-                        input_row = MAX_ROW - 1; // Stay at the last row
-
-                        // Optional: Scroll the screen if implemented
-                        // scroll_screen();
-                    }
-                }
-
-                // Ensure cursor position is valid before updating
-                if (input_col >= 2 && input_col < MAX_COL && input_row < MAX_ROW)
-                {
-                    draw_cursor(input_row, input_col, input_buffer); // Update the cursor position
-                }
             }
 
             usleep(10000); // 🔹 Small delay to ensure rendering catches up
