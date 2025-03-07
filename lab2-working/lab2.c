@@ -183,7 +183,7 @@ int main()
                 input_col++;
 
                 // Wrap to next line when reaching column limit (assume 64 columns)
-                if (input_col >= 64)
+                if (input_col >= 132)
                 {
                     input_col = 0; // Reset column to beginning
                     input_row = 44; // Move cursor to the second row
@@ -199,7 +199,7 @@ int main()
 
                 if (input_col < 0)  // Move cursor back to previous row if needed
                 {
-                    input_col = 63; // Move to last column of previous row
+                    input_col = 132; // Move to last column of previous row
                     input_row = 43;
                 }
 
