@@ -248,7 +248,8 @@ int main()
                 }
 
                 fbputchar(input_buffer[input_col], input_row, input_col); // Restore character
-                draw_cursor(input_row, input_col, input_buffer); // Update cursor
+                draw_cursor(input_row, input_col);
+
             }
 
             // Right Arrow Key (0x4F)
@@ -262,7 +263,7 @@ int main()
                 }
 
                 fbputchar(input_buffer[input_col], input_row, input_col); // Restore character
-                draw_cursor(input_row, input_col, input_buffer); // Update cursor
+                draw_cursor(input_row, input_col);
             }
 
             
