@@ -169,19 +169,12 @@ int main()
         if (transferred == sizeof(packet))
         {
             char c = keycode_to_ascii(packet.keycode[0], packet.modifiers);
-            if (c && strlen(input_buffer) < 264 - 1) { // Ensure we don't exceed 264 (132*2) chars
-                int buffer_index = (input_row == 43) ? input_col : input_col + 132;
-                input_buffer[buffer_index] = c;
-            
+            if (c && input_col - 2 < BUFFER_SIZE - 1)
+            { // 🔹 Ensure character is stored BEFORE moving cursor
+                input_buffer[input_col - 2] = c;  
                 fbputchar(c, input_row, input_col);
                 input_col++;
-            
-                if (input_col >= 132 && input_row == 43) {
-                    input_col = 0;
-                    input_row = 44;
-                }
-            
-                draw_cursor(input_row, input_col);
+                draw_cursor(input_row, input_col, input_buffer);  // 🔹 Update cursor immediately
             }
             
 
