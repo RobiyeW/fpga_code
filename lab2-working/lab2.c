@@ -118,7 +118,7 @@ int main()
 
     pthread_create(&network_thread, NULL, network_thread_f, NULL);
 
-    // Start the cursor blinking as a background task
+    // Start cursor blinking
     pthread_t cursor_thread;
     pthread_create(&cursor_thread, NULL, (void *(*)(void *))draw_cursor, NULL);
     pthread_detach(cursor_thread);
@@ -129,9 +129,9 @@ int main()
         if (transferred == sizeof(packet))
         {
             char c = keycode_to_ascii(packet.keycode[0], packet.modifiers);
-            if (c && input_col - 2 < 127) // Make sure we stay in buffer bounds
+            if (c && input_col - 2 < 127) // Ensure we stay within bounds
             { 
-                store_input_char(input_col, c); // 🔹 Store in `fbputchar.c`'s input_buffer
+                store_input_char(input_col, c);  // 🔹 Store in `fbputchar.c`'s buffer
                 fbputchar(c, input_row, input_col);
                 input_col++;
             }
@@ -139,7 +139,7 @@ int main()
             { 
                 input_col--;
                 fbputchar(' ', input_row, input_col);
-                store_input_char(input_col, '\0'); // 🔹 Remove last character
+                store_input_char(input_col, '\0');  // 🔹 Remove character
             }
             
             if ((packet.keycode[0] == 0x2B || packet.keycode[0] == 0x43) && input_col < 60)
@@ -153,16 +153,18 @@ int main()
     
             if (packet.keycode[0] == 0x50 && input_col > 2)
             { 
-                fbputchar(input_buffer[input_col - 2], input_row, input_col);
+                fbputchar(' ', input_row, input_col); // Erase cursor
                 input_col--;
+                draw_cursor(input_row, input_col); // Move cursor
             }
-            if (packet.keycode[0] == 0x4F && input_col < 64 && input_buffer[input_col - 2] != '\0')
+            if (packet.keycode[0] == 0x4F && input_col < 64) // Right Arrow
             { 
-                fbputchar(input_buffer[input_col - 2], input_row, input_col);
+                fbputchar(' ', input_row, input_col); // Erase cursor
                 input_col++;
+                draw_cursor(input_row, input_col); // Move cursor
             }
             
-            if (packet.keycode[0] == 0x28)
+            if (packet.keycode[0] == 0x28) // Enter key
             { 
                 send(sockfd, input_buffer, strlen(input_buffer), 0);
                 display_received_message(input_buffer);
@@ -180,3 +182,4 @@ int main()
     pthread_join(network_thread, NULL);
     return 0;
 }
+
