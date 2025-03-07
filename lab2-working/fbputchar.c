@@ -222,7 +222,7 @@ void display_received_message(const char *message) {
 
 void scroll_text_up() {
     int start_row = 0;  // Start scrolling from the top
-    int end_row = 42;   // Stop scrolling at row 41
+    int end_row = 51;   // Stop scrolling at row 41
     int scroll_height = (end_row - 1) * FONT_HEIGHT; // Rows to move
     int start_offset = fb_finfo.line_length * start_row * FONT_HEIGHT;
 
@@ -237,24 +237,24 @@ void scroll_text_up() {
 }
 
 void draw_cursor(int row, int col, char *input_buffer) {
-    static int prev_row = 43, prev_col = 1;  // Ensure starting position is correct
+    static int prev_row = 43, prev_col = 2;
 
-    // Restore previous character at the old cursor position
-    if (prev_col >= 1) {
-        int buffer_index = (prev_row == 43) ? prev_col - 1 : prev_col - 1 + 128;
+    // Restore previous character instead of drawing cursor in the buffer
+    if (prev_col >= 2) {
+        int buffer_index = (prev_row == 43) ? prev_col - 2 : prev_col - 2 + 132;
         fbputchar(input_buffer[buffer_index] ? input_buffer[buffer_index] : ' ', prev_row, prev_col);
     }
 
-    // Handle cursor movement to row 44 when exceeding col 128
-    if (col > 128 && row == 43) {
+    // Handle cursor movement to row 44 when exceeding col 131
+    if (col >= 128 && row == 43) {
         row = 44;
-        col = 1;  // Start at col 1 in the next row
+        col = 0;
     }
 
-    // Handle cursor movement back to row 43 when moving left past col 1 in row 44
-    if (col < 1 && row == 44) {
+    // Handle cursor movement back to row 43 when moving left past col 0 in row 44
+    if (col < 0 && row == 44) {
         row = 43;
-        col = 128;  // Go to last column in row 43
+        col = 128;
     }
 
     // Draw cursor at the correct position

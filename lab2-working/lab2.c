@@ -201,7 +201,7 @@ int main()
     
             // Left Arrow (0x50)
             if (packet.keycode[0] == 0x50) {  
-                // Restore original character at current position
+                // Restore original character at the current cursor position
                 int buffer_index = (input_row == 43) ? input_col - 1 : input_col - 1 + 128;
                 fbputchar(input_buffer[buffer_index] ? input_buffer[buffer_index] : ' ', input_row, input_col);
 
@@ -210,7 +210,7 @@ int main()
                     input_col--;  
                 } 
                 else if (input_col == 1 && input_row == 44) {  
-                    input_row = 43;  // Move back to row 43
+                    input_row = 43;  // Move up one row
                     input_col = 128;  // Go to last column
                 }
 
@@ -219,7 +219,7 @@ int main()
 
             // Right Arrow (0x4F)
             if (packet.keycode[0] == 0x4F) {  
-                // Restore original character at current position
+                // Restore original character at the current cursor position
                 int buffer_index = (input_row == 43) ? input_col - 1 : input_col - 1 + 128;
                 fbputchar(input_buffer[buffer_index] ? input_buffer[buffer_index] : ' ', input_row, input_col);
 
@@ -228,13 +228,30 @@ int main()
                     input_col++;  
                 } 
                 else if (input_col == 128 && input_row == 43) {  
-                    input_row = 44;  // Move to next row
-                    input_col = 1;   // Start at col 1
+                    input_row = 44;  // Move down to row 44
+                    input_col = 1;   // Start at column 1
                 }
 
                 draw_cursor(input_row, input_col, input_buffer);
             }
 
+
+            // Right Arrow (0x4F)
+            if (packet.keycode[0] == 0x4F) {  
+                // Restore original character at current position
+                fbputchar(input_buffer[(input_row - 43) * 128 + (input_col - 2)], input_row, input_col);
+
+                // Move right
+                if (input_col < 128 && input_buffer[(input_row - 43) * 128 + (input_col - 1)] != '\0') {  
+                    input_col++;  
+                } 
+                else if (input_col >= 128 && input_row < 44) {  
+                    input_row++;  // Move down to next row
+                    input_col = 1;  // Start at column 2
+                }
+
+                draw_cursor(input_row, input_col, input_buffer);
+            }
 
             
             if (packet.keycode[0] == 0x28) { // Enter key
