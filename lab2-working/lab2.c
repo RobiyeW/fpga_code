@@ -225,7 +225,10 @@ int main()
                 // Apply remaining tab spaces (ensure we don't exceed column 132 in row 44)
                 for (int i = 0; i < spaces_to_add && input_col < 132; i++) {
                     fbputchar(' ', input_row, input_col);
-                    input_col++;
+                    fbputchar(' ', input_row, input_col);
+                    fbputchar(' ', input_row, input_col);
+                    fbputchar(' ', input_row, input_col);
+                    input_col+4;
                 }
             
                 draw_cursor(input_row, input_col, input_buffer);
