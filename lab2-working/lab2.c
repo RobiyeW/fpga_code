@@ -141,6 +141,10 @@ int main()
     int transferred, input_col = 2, input_row = 43;
     char input_buffer[BUFFER_SIZE] = {0};
 
+    for (col = 0; col < 64; col++) {
+        fbputchar('*', 42, col);
+    }
+
     fbopen();
     fbclear();
     fbputs("> ", 43, 0);
