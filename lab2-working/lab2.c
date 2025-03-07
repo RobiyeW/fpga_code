@@ -33,7 +33,7 @@ char keycode_to_ascii(uint8_t keycode, uint8_t modifiers)
         'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', // 4-13
         'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', // 14-23
         'u', 'v', 'w', 'x', 'y', 'z', '1', '2', '3', '4', // 24-33
-        '5', '6', '7', '8', '9', '0', '-', '=', '[', ' ', // 34-43
+        '5', '6', '7', '8', '9', '0', '-', '=', '[', '\t', // 34-43
         ' ', '-', '=', '[', ']', '\\', '/', ' '          // 44-50 (Space at 50)
     };
 
@@ -225,10 +225,7 @@ int main()
                 // Apply remaining tab spaces (ensure we don't exceed column 132 in row 44)
                 for (int i = 0; i < spaces_to_add && input_col < 132; i++) {
                     fbputchar(' ', input_row, input_col);
-                    fbputchar(' ', input_row, input_col);
-                    fbputchar(' ', input_row, input_col);
-                    fbputchar(' ', input_row, input_col);
-                    input_col = input_col + 4;
+                    input_col++;
                 }
             
                 draw_cursor(input_row, input_col, input_buffer);
