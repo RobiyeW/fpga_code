@@ -208,9 +208,12 @@ int main()
                 if (input_col > 2) {  
                     input_col--;  
                 } 
-                else if (input_col == 2 && input_row > 43) {  
+                else if (input_col == 1 && input_row > 43) {  
                     input_row--;  // Move up one row
                     input_col = 128;  // Go to last column
+                }
+                else if (input_col == 1 && input_row = 44) {  
+                    input_row++;  // Move up one row
                 }
 
                 draw_cursor(input_row, input_col, input_buffer);
@@ -227,7 +230,7 @@ int main()
                 } 
                 else if (input_col >= 128 && input_row < 44) {  
                     input_row++;  // Move down to next row
-                    input_col = 2;  // Start at column 2
+                    input_col = 1;  // Start at column 2
                 }
 
                 draw_cursor(input_row, input_col, input_buffer);
