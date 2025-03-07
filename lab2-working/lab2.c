@@ -174,7 +174,7 @@ int main()
                 input_buffer[input_col - 2] = c;  
                 fbputchar(c, input_row, input_col);
                 input_col++;
-                draw_cursor(input_row, input_col, input_buffer);  // 🔹 Update cursor immediately
+                draw_cursor(input_row, input_col);  // 🔹 Update cursor immediately
             }
             
 
