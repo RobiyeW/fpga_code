@@ -167,13 +167,18 @@ int main()
             }
     
             if (packet.keycode[0] == 0x50 && input_col > 2)
-            { // Left Arrow
-                input_col--;
+            { // Left Arrow (0x50)
+                fbputchar(input_buffer[input_col - 2], input_row, input_col);  // 🔹 Restore original character
+                input_col--;  // 🔹 Move left
+                draw_cursor(input_row, input_col);  // 🔹 Redraw cursor at new position
             }
-            if (packet.keycode[0] == 0x80 && input_col < 64 && input_buffer[input_col - 2])
-            { // Right Arrow
-                input_col++;
+            if (packet.keycode[0] == 0x4F && input_col < 64 && input_buffer[input_col - 2] != '\0')
+            { // Right Arrow (0x4F)
+                fbputchar(input_buffer[input_col - 2], input_row, input_col);  // 🔹 Restore original character
+                input_col++;  // 🔹 Move right
+                draw_cursor(input_row, input_col);  // 🔹 Redraw cursor at new position
             }
+            
             if (packet.keycode[0] == 0x28)
             { // Enter
                 send(sockfd, input_buffer, strlen(input_buffer), 0);

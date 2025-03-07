@@ -227,8 +227,21 @@ void scroll_text_up() {
 }
 
 void draw_cursor(int row, int col) {
+    static int prev_row = -1, prev_col = -1;
+
+    // 🔹 Erase previous cursor position by restoring the correct character
+    if (prev_row != -1 && prev_col != -1) {
+        fbputchar(' ', prev_row, prev_col);  // Restore original space
+    }
+
+    // 🔹 Draw new cursor
     fbputchar('_', row, col);
+
+    // 🔹 Update previous cursor position
+    prev_row = row;
+    prev_col = col;
 }
+
 
 /* 8 X 16 console font from /lib/kbd/consolefonts/lat0-16.psfu.gz
 
