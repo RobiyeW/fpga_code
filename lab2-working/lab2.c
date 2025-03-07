@@ -142,9 +142,6 @@ int main()
     int transferred, input_col = 2, input_row = 43;
     char input_buffer[BUFFER_SIZE] = {0};
 
-    // for (col = 0; col < 132; col++) {
-    //     fbputchar('*', 42, col);
-    // }
 
     fbopen();
     fbclear();
@@ -172,40 +169,39 @@ int main()
         if (transferred == sizeof(packet))
         {
             char c = keycode_to_ascii(packet.keycode[0], packet.modifiers);
-            if (c && strlen(input_buffer) < BUFFER_SIZE - 1)
-            { 
-                // Store character in buffer
-                input_buffer[strlen(input_buffer)] = c;
-                
-                // Print character on screen
+            if (c && strlen(input_buffer) < 264 - 1) { // Ensure we don't exceed 264 (132*2) chars
+                int buffer_index = (input_row == 43) ? input_col : input_col + 132;
+                input_buffer[buffer_index] = c;
+            
                 fbputchar(c, input_row, input_col);
                 input_col++;
-
-                // Wrap to next line when reaching column limit (assume 132 columns)
-                if (input_col >= 132)
-                {
-                    input_col = 0; // Reset column to beginning
-                    input_row = 44; // Move cursor to the second row
+            
+                if (input_col >= 132 && input_row == 43) {
+                    input_col = 0;
+                    input_row = 44;
                 }
-
+            
                 draw_cursor(input_row, input_col);
             }
+            
 
-            // Handle backspace (0x2A)
-            if (packet.keycode[0] == 0x2A && strlen(input_buffer) > 0)
-            {
+            if (packet.keycode[0] == 0x2A && strlen(input_buffer) > 0) {
                 input_col--;
-
-                if (input_col < 0)  // Move cursor back to previous row if needed
-                {
-                    input_col = 132; // Move to last column of previous row
+            
+                // Handle transition from row 44 to row 43
+                if (input_col < 0 && input_row == 44) {
+                    input_col = 131;
                     input_row = 43;
                 }
-
+            
+                // Remove from buffer
+                int buffer_index = (input_row == 43) ? input_col : input_col + 132;
+                input_buffer[buffer_index] = '\0';
+            
                 fbputchar(' ', input_row, input_col); // Clear character visually
-                input_buffer[strlen(input_buffer) - 1] = '\0'; // Remove from buffer
                 draw_cursor(input_row, input_col);
             }
+            
             
             if ((packet.keycode[0] == 0x2B || packet.keycode[0] == 0x43)) { // Tab Key
                 int spaces_to_add = 4;
@@ -267,33 +263,26 @@ int main()
             }
 
             
-            // Handle Enter (0x28)
-            if (packet.keycode[0] == 0x28) {  
-                char message_to_send[BUFFER_SIZE] = {0};  // Buffer to store the message
-
-                if (input_row == 43) {  
-                    // Send only row 43's content
-                    strncpy(message_to_send, input_buffer, 132);  
-                } 
-                else if (input_row == 44) {  
-                    // Send row 43 followed by row 44's content
-                    snprintf(message_to_send, BUFFER_SIZE, "%s%s", input_buffer, &input_buffer[132]);  
+            if (packet.keycode[0] == 0x28) {
+                char message_to_send[264] = {0};  // Buffer for entire message
+            
+                if (input_row == 43) {
+                    strncpy(message_to_send, input_buffer, 132);
+                } else if (input_row == 44) {
+                    snprintf(message_to_send, 264, "%s%s", input_buffer, &input_buffer[132]);
                 }
-
-                send(sockfd, message_to_send, strlen(message_to_send), 0);  // Send to server
-                display_received_message(message_to_send);  
-
-                // Clear input area for both rows 43 and 44
+            
+                send(sockfd, message_to_send, strlen(message_to_send), 0);
+                display_received_message(message_to_send);
+            
                 memset(input_buffer, 0, sizeof(input_buffer));
                 fbclear_input_area();
-                
-                // Redraw the user input prompt in row 43
                 fbputs("> ", 43, 0);
-
-                // Reset cursor and input tracking
+            
                 input_col = 1;
                 input_row = 43;
             }
+            
 
 
             

@@ -16,7 +16,7 @@
 struct fb_var_screeninfo fb_vinfo;
 struct fb_fix_screeninfo fb_finfo;
 unsigned char *framebuffer;
-static char input_buffer[132];
+static char input_buffer[234];
 static unsigned char font[] = {
   0x00, 0x00, 0x7e, 0xc3, 0x99, 0x99, 0xf3, 0xe7, 0xe7, 0xff, 0xe7, 0xe7, 0x7e, 0x00, 0x00, 0x00,
   0x00, 0x00, 0x00, 0x00, 0x00, 0x76, 0xdc, 0x00, 0x76, 0xdc, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -235,38 +235,35 @@ void draw_cursor(int row, int col) {
         int restore_row = prev_row;
         int restore_col = prev_col;
 
-        // Handle row transitions
         if (prev_col >= 132) {
             restore_col = prev_col - 132;
             restore_row = 44;
-        } 
-        else if (prev_col < 0 && prev_row == 44) {
+        } else if (prev_col < 0 && prev_row == 44) {
             restore_col = 131;
             restore_row = 43;
         }
 
-        fbputchar(input_buffer[restore_row * 132 + restore_col] ? input_buffer[restore_row * 132 + restore_col] : ' ', restore_row, restore_col);
+        int buffer_index = (restore_row == 43) ? restore_col : restore_col + 132;
+        fbputchar(input_buffer[buffer_index] ? input_buffer[buffer_index] : ' ', restore_row, restore_col);
     }
 
-    // Handle rightward movement past col 131 in row 43
+    // Handle moving right at column 131 in row 43
     if (col >= 132 && row == 43) {
         row = 44;
         col = 0;
     }
 
-    // Handle leftward movement past col 0 in row 44
+    // Handle moving left at column 0 in row 44
     if (col < 0 && row == 44) {
         row = 43;
         col = 131;
     }
 
-    // Draw cursor but do NOT modify input_buffer
     fbputchar('_', row, col);
-
-    // Update previous position
     prev_row = row;
     prev_col = col;
 }
+
 
 
 
