@@ -118,7 +118,7 @@ int main()
 
     pthread_create(&network_thread, NULL, network_thread_f, NULL);
 
-    // Start cursor blinking
+    // Start the cursor blinking
     pthread_t cursor_thread;
     pthread_create(&cursor_thread, NULL, (void *(*)(void *))draw_cursor, NULL);
     pthread_detach(cursor_thread);
@@ -151,7 +151,7 @@ int main()
                 }
             }
     
-            if (packet.keycode[0] == 0x50 && input_col > 2)
+            if (packet.keycode[0] == 0x50 && input_col > 2) // Left Arrow
             { 
                 fbputchar(' ', input_row, input_col); // Erase cursor
                 input_col--;
@@ -166,8 +166,14 @@ int main()
             
             if (packet.keycode[0] == 0x28) // Enter key
             { 
-                send(sockfd, input_buffer, strlen(input_buffer), 0);
-                display_received_message(input_buffer);
+                char message[128]; // Local buffer to fetch stored input
+                memset(message, 0, sizeof(message));
+
+                // Fetch stored input
+                strncpy(message, input_buffer, sizeof(message) - 1);
+                
+                send(sockfd, message, strlen(message), 0);
+                display_received_message(message);
                 clear_input_buffer(); // 🔹 Reset buffer inside `fbputchar.c`
                 fbclear_input_area();
                 fbputs("> ", 23, 0);
@@ -182,4 +188,3 @@ int main()
     pthread_join(network_thread, NULL);
     return 0;
 }
-
