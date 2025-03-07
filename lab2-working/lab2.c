@@ -138,7 +138,7 @@ int main()
     int transferred, input_col = 2, input_row = 43;
     char input_buffer[BUFFER_SIZE] = {0};
 
-    for (col = 0; col < 132; col++)
+    for (col = 0; col < 130; col++)
     {
         fbputchar('*', 42, col);
     }
@@ -177,7 +177,7 @@ int main()
                 input_buffer[input_col - 2] = '\0';   // Remove from buffer safely
             }
 
-            if ((packet.keycode[0] == 0x2B || packet.keycode[0] == 0x43) && input_col < 132)
+            if ((packet.keycode[0] == 0x2B || packet.keycode[0] == 0x43) && input_col < 130)
             { // Tab (0x43) - Moves cursor forward 4 spaces
                 for (int i = 0; i < 4; i++)
                 {
