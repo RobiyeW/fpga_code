@@ -33,8 +33,8 @@ char keycode_to_ascii(uint8_t keycode, uint8_t modifiers)
         'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', // 4-13
         'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', // 14-23
         'u', 'v', 'w', 'x', 'y', 'z', '1', '2', '3', '4', // 24-33
-        '5', '6', '7', '8', '9', '0', '-', '=', '[', '    ', // 34-43
-        '\\', '-', '=', '`', ',', '.', '/', ' '          // 44-50 (Space at 50)
+        '5', '6', '7', '8', '9', '0', '-', '=', '[', '\t', // 34-43
+        '\\', '-', '=', '`', ']', '.', '/', ' '          // 44-50 (Space at 50)
     };
 
     static const char shift_keymap[] = {
@@ -43,7 +43,7 @@ char keycode_to_ascii(uint8_t keycode, uint8_t modifiers)
         'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', // 14-23
         'U', 'V', 'W', 'X', 'Y', 'Z', '!', '@', '#', '$', // 24-33
         '%', '^', '&', '*', '(', ')', '_', '+', '{', '}', // 34-43
-        '|', ':', '"', '~', '<', '>', '?', ' '            // 44-50 (Space at 50)
+        '|', '_', '+', '~', '<', '>', '?', ' '            // 44-50 (Space at 50)
     };
 
     // Check if the keycode is in the valid range (4-50)
@@ -69,7 +69,7 @@ char keycode_to_ascii(uint8_t keycode, uint8_t modifiers)
     case 0x2e:
         return '=';
     case 0x34:
-        return '\'';
+        return ' ';
     case 0x36:
         return ',';
     case 0x37:
