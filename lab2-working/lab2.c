@@ -235,10 +235,10 @@ int main()
                 }
                 draw_cursor(input_row, input_col, input_buffer); // Update the cursor position
             }
-            == == == =
+            // == == == =
 
-                         // >>>>>>> 7e6f00d353ef0e74049896b53bd1625c93cb9b15
-                usleep(10000); // 🔹 Small delay to ensure rendering catches up
+            // >>>>>>> 7e6f00d353ef0e74049896b53bd1625c93cb9b15
+            usleep(10000); // 🔹 Small delay to ensure rendering catches up
             draw_cursor(input_row, input_col, input_buffer);
         }
     }
