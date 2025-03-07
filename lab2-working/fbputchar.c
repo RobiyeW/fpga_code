@@ -215,7 +215,7 @@ void display_received_message(const char *message) {
     fbputs(message, message_row, 0);
     message_row++;
     if (message_row > 21) {
-        scroll_text_up();
+        scrollclear_above_row_41();
         message_row--;
     }
 }
