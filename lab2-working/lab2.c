@@ -195,13 +195,13 @@ int main() {
             }
 
             // Handle Left Arrow (0x50)
-            if (packet.keycode[0] == 0x50 && cursor_col <= 2) {  
+            if (packet.keycode[0] == 0x50) {  
                 cursor_col--;
                 draw_cursor();
             }
 
             // Handle Right Arrow (0x4F)
-            if (packet.keycode[0] == 0x4F && cursor_col <= 2) {  
+            if (packet.keycode[0] == 0x4F) {  
                 cursor_col++;
                 draw_cursor();
             }
