@@ -100,12 +100,14 @@ void *network_thread_f(void *ignored)
 
 void *cursor_blink_thread(void *arg)
 {
+    char *input_buffer = (char *)arg;  // Correctly cast void* to char*
     int blink_state = 1;
+    
     while (1)
     {
         if (blink_state)
         {
-            draw_cursor(23, 2);
+            draw_cursor(23, 2, input_buffer);
         }
         else
         {
@@ -116,6 +118,7 @@ void *cursor_blink_thread(void *arg)
     }
     return NULL;
 }
+
 
 int main()
 {
@@ -136,7 +139,7 @@ int main()
     connect(sockfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr));
 
     pthread_create(&network_thread, NULL, network_thread_f, NULL);
-    pthread_create(&cursor_thread, NULL, cursor_blink_thread, NULL);
+    pthread_create(&cursor_thread, NULL, cursor_blink_thread, (void *)input_buffer);
     pthread_detach(cursor_thread);
 
     for (;;)
@@ -146,17 +149,19 @@ int main()
         {
             char c = keycode_to_ascii(packet.keycode[0], packet.modifiers);
             if (c && input_col - 2 < BUFFER_SIZE - 1)
-            { // 🔹 Buffer Protection
+            { // 🔹 Ensure character is stored BEFORE moving cursor
+                input_buffer[input_col - 2] = c;  
                 fbputchar(c, input_row, input_col);
-                input_buffer[input_col - 2] = c;
                 input_col++;
+                draw_cursor(input_row, input_col, input_buffer);  // 🔹 Update cursor immediately
             }
             if ((packet.keycode[0] == 0x2A || packet.keycode[0] == 0x42) && input_col > 2)
-            { // Backspace (Handle both `0x2A` and `0x42`)
+            {
                 input_col--;
                 fbputchar(' ', input_row, input_col);  // Clear character from framebuffer
-                input_buffer[input_col - 2] = '\0';   // Remove from buffer
+                input_buffer[input_col - 2] = '\0';   // Remove from buffer safely
             }
+            
             if ((packet.keycode[0] == 0x2B || packet.keycode[0] == 0x43) && input_col < 60)
             { // Tab (0x43) - Moves cursor forward 4 spaces
                 for (int i = 0; i < 4; i++)
@@ -170,13 +175,13 @@ int main()
             { // Left Arrow (0x50)
                 fbputchar(input_buffer[input_col - 2], input_row, input_col);  // 🔹 Restore original character
                 input_col--;  // 🔹 Move left
-                draw_cursor(input_row, input_col);  // 🔹 Redraw cursor at new position
+                draw_cursor(input_row, input_col, input_buffer);  // 🔹 Redraw cursor at new position
             }
             if (packet.keycode[0] == 0x4F && input_col < 64 && input_buffer[input_col - 2] != '\0')
             { // Right Arrow (0x4F)
                 fbputchar(input_buffer[input_col - 2], input_row, input_col);  // 🔹 Restore original character
                 input_col++;  // 🔹 Move right
-                draw_cursor(input_row, input_col);  // 🔹 Redraw cursor at new position
+                draw_cursor(input_row, input_col, input_buffer);  // 🔹 Redraw cursor at new position
             }
             
             if (packet.keycode[0] == 0x28)
@@ -188,7 +193,9 @@ int main()
                 fbputs("> ", 23, 0);
                 input_col = 2;
             }
-            draw_cursor(input_row, input_col);
+            usleep(10000); // 🔹 Small delay to ensure rendering catches up
+            draw_cursor(input_row, input_col, input_buffer);
+            
         }
     }
 

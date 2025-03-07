@@ -16,6 +16,7 @@
 struct fb_var_screeninfo fb_vinfo;
 struct fb_fix_screeninfo fb_finfo;
 unsigned char *framebuffer;
+static char input_buffer[128];
 static unsigned char font[] = {
   0x00, 0x00, 0x7e, 0xc3, 0x99, 0x99, 0xf3, 0xe7, 0xe7, 0xff, 0xe7, 0xe7, 0x7e, 0x00, 0x00, 0x00,
   0x00, 0x00, 0x00, 0x00, 0x00, 0x76, 0xdc, 0x00, 0x76, 0xdc, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -226,21 +227,22 @@ void scroll_text_up() {
            fb_finfo.line_length * FONT_HEIGHT);
 }
 
-void draw_cursor(int row, int col) {
-    static int prev_row = -1, prev_col = -1;
+void draw_cursor(int row, int col, char *input_buffer) {
+    static int prev_row = 23, prev_col = 2;  // 🔹 Keep track of previous position
 
-    // 🔹 Erase previous cursor position by restoring the correct character
-    if (prev_row != -1 && prev_col != -1) {
-        fbputchar(' ', prev_row, prev_col);  // Restore original space
+    // 🔹 Restore character at old cursor position
+    if (prev_col >= 2) {
+        fbputchar(input_buffer[prev_col - 2] ? input_buffer[prev_col - 2] : ' ', prev_row, prev_col);
     }
 
     // 🔹 Draw new cursor
     fbputchar('_', row, col);
 
-    // 🔹 Update previous cursor position
+    // 🔹 Update previous position
     prev_row = row;
     prev_col = col;
 }
+
 
 
 /* 8 X 16 console font from /lib/kbd/consolefonts/lat0-16.psfu.gz
