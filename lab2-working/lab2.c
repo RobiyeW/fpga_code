@@ -220,7 +220,7 @@ int main()
             // Right Arrow (0x4F)
             if (packet.keycode[0] == 0x4F) {  
                 // Restore original character at the current cursor position
-                int buffer_index = (input_row == 43) ? input_col - 1 : input_col - 1 + 128;
+                int buffer_index = (input_row == 43) ? input_col - 2 : input_col - 2 + 128;
                 fbputchar(input_buffer[buffer_index] ? input_buffer[buffer_index] : ' ', input_row, input_col);
 
                 // Move right
