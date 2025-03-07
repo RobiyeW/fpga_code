@@ -42,7 +42,7 @@ char keycode_to_ascii(uint8_t keycode, uint8_t modifiers)
         'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', // 4-13
         'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', // 14-23
         'U', 'V', 'W', 'X', 'Y', 'Z', '!', '@', '#', '$', // 24-33
-        '%', '^', '&', '*', '(', ')', '_', '+', '{', '}', // 34-43
+        '%', '^', '&', '*', '(', ')', '_', '+', '{', '\t', // 34-43
         '|', '_', '+', '{', '}', '|', '?', ' '            // 44-50 (Space at 50)
     };
 
@@ -64,18 +64,19 @@ char keycode_to_ascii(uint8_t keycode, uint8_t modifiers)
         return '\t'; // Tab
     case 0x2C:
         return ' '; // Space
+    // Handle special characters when Shift is toggled
     case 0x34:
-        return '\''; 
+        return (modifiers & (USB_LSHIFT | USB_RSHIFT)) ? '"' : '\''; // ' -> "
     case 0x35:
-        return '`';
+        return (modifiers & (USB_LSHIFT | USB_RSHIFT)) ? '~' : '`'; // ` -> ~
     case 0x36:
-        return ',';
+        return (modifiers & (USB_LSHIFT | USB_RSHIFT)) ? '<' : ','; // , -> <
     case 0x37:
-        return '.';
+        return (modifiers & (USB_LSHIFT | USB_RSHIFT)) ? '>' : '.'; // . -> >
     case 0x38:
-        return '/';
+        return (modifiers & (USB_LSHIFT | USB_RSHIFT)) ? '?' : '/'; // / -> ?
     case 0x33:
-        return ';';
+        return (modifiers & (USB_LSHIFT | USB_RSHIFT)) ? ':' : ';'; // ; -> :
     default:
         // Log the unknown keycode for debugging
         printf("Unknown keycode: 0x%X\n", keycode);
