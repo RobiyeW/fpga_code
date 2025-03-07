@@ -262,16 +262,31 @@ int main()
 
             
             // Handle Enter (0x28)
-            if (packet.keycode[0] == 0x28)
-            {
-                send(sockfd, input_buffer, strlen(input_buffer), 0);
-                display_received_message(input_buffer);
+            if (packet.keycode[0] == 0x28) {  
+                char message_to_send[BUFFER_SIZE] = {0};  // Buffer to store the message
+
+                if (input_row == 43) {  
+                    // Send only row 43's content
+                    strncpy(message_to_send, input_buffer, 132);  
+                } 
+                else if (input_row == 44) {  
+                    // Send row 43 followed by row 44's content
+                    snprintf(message_to_send, BUFFER_SIZE, "%s%s", input_buffer, &input_buffer[132]);  
+                }
+
+                send(sockfd, message_to_send, strlen(message_to_send), 0);  // Send to server
+                display_received_message(message_to_send);  
+
+                // Clear input area
                 memset(input_buffer, 0, sizeof(input_buffer));
                 fbclear_input_area();
                 fbputs("> ", 43, 0);
+
+                // Reset cursor to start of row 43
                 input_col = 0;
-                input_row = 43; // Reset cursor to first input row
+                input_row = 43;
             }
+
             
             usleep(10000); // 🔹 Small delay to ensure rendering catches up
             draw_cursor(input_row, input_col, input_buffer);
