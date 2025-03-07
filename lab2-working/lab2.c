@@ -145,7 +145,7 @@ int main()
 
     for (col = 0; col < 130; col++)
     {
-        fbputchar('*', 33, col);
+        fbputchar('*', 40, col);
     }
     fbputs("> ", 43, 0);
 
@@ -174,7 +174,7 @@ int main()
             }
             if ((packet.keycode[0] == 0x2A || packet.keycode[0] == 0x42) && input_col > 2)
             {
-                input_col--; //
+                input_col--;
                 input_col--;
                 fbputchar(' ', input_row, input_col); // Clear character from framebuffer
                 input_buffer[input_col - 2] = '\0';   // Remove from buffer safely
