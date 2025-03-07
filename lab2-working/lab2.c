@@ -170,7 +170,7 @@ int main()
             { // Left Arrow
                 input_col--;
             }
-            if (packet.keycode[0] == 0x4F && input_col < 64 && input_buffer[input_col - 2])
+            if (packet.keycode[0] == 0x80 && input_col < 64 && input_buffer[input_col - 2])
             { // Right Arrow
                 input_col++;
             }
