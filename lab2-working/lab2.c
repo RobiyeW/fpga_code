@@ -166,7 +166,6 @@ int main()
     pthread_create(&network_thread, NULL, network_thread_f, NULL);
     pthread_detach(network_thread);
 
-
     for (;;)
     {
         libusb_interrupt_transfer(keyboard, endpoint_address, (unsigned char *)&packet, sizeof(packet), &transferred, 0);
@@ -182,7 +181,7 @@ int main()
                 fbputchar(c, input_row, input_col);
                 input_col++;
 
-                // Wrap to next line when reaching column limit (assume 64 columns)
+                // Wrap to next line when reaching column limit (assume 132 columns)
                 if (input_col >= 132)
                 {
                     input_col = 0; // Reset column to beginning
@@ -207,7 +206,29 @@ int main()
                 input_buffer[strlen(input_buffer) - 1] = '\0'; // Remove from buffer
                 draw_cursor(input_row, input_col, input_buffer);
             }
-
+            
+            if ((packet.keycode[0] == 0x2B || packet.keycode[0] == 0x43) && input_col < 132)
+            { // Tab (0x43) - Moves cursor forward 4 spaces
+                for (int i = 0; i < 4; i++)
+                {
+                    fbputchar(' ', input_row, input_col);
+                    input_col++;
+                }
+            }
+    
+            if (packet.keycode[0] == 0x50 && input_col > 2)
+            { // Left Arrow (0x50)
+                fbputchar(input_buffer[input_col - 2], input_row, input_col);  // 🔹 Restore original character
+                input_col--;  // 🔹 Move left
+                draw_cursor(input_row, input_col, input_buffer);  // 🔹 Redraw cursor at new position
+            }
+            if (packet.keycode[0] == 0x4F && input_col < 132 && input_buffer[input_col - 2] != '\0')
+            { // Right Arrow (0x4F)
+                fbputchar(input_buffer[input_col - 2], input_row, input_col);  // 🔹 Restore original character
+                input_col++;  // 🔹 Move right
+                draw_cursor(input_row, input_col, input_buffer);  // 🔹 Redraw cursor at new position
+            }
+            
             // Handle Enter (0x28)
             if (packet.keycode[0] == 0x28)
             {
@@ -219,9 +240,10 @@ int main()
                 input_col = 0;
                 input_row = 43; // Reset cursor to first input row
             }
-
-            usleep(10000);
+            
+            usleep(10000); // 🔹 Small delay to ensure rendering catches up
             draw_cursor(input_row, input_col, input_buffer);
+            
         }
     }
 
