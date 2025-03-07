@@ -228,23 +228,11 @@ void scroll_text_up() {
 }
 
 void draw_cursor(int row, int col, char *input_buffer) {
-    static int prev_row = 43, prev_col = 0;
+    static int prev_row = 43, prev_col = 2;
 
-    // Restore previous character before cursor was moved
-    if (prev_col >= 0) {
-        int restore_row = prev_row;
-        int restore_col = prev_col;
-        
-        // Handle multi-row behavior
-        if (prev_col >= 64) {
-            restore_col = prev_col - 64;
-            restore_row = 44;
-        } else if (prev_col < 0) {
-            restore_col = 63;
-            restore_row = 43;
-        }
-
-        fbputchar(input_buffer[restore_col] ? input_buffer[restore_col] : ' ', restore_row, restore_col);
+    // Restore previous character instead of drawing cursor in the buffer
+    if (prev_col >= 2) {
+        fbputchar(input_buffer[prev_col - 2] ? input_buffer[prev_col - 2] : ' ', prev_row, prev_col);
     }
 
     // Draw cursor but do NOT modify input_buffer
@@ -253,7 +241,6 @@ void draw_cursor(int row, int col, char *input_buffer) {
     prev_row = row;
     prev_col = col;
 }
-
 
 
 
