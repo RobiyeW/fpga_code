@@ -151,7 +151,7 @@ int main()
 
     for (col = 0; col < 130; col++)
     {
-        fbputchar('*', 41, col);
+        fbputchar('*', 42, col);
     }
 
     fbputs("> ", 43, 0);
@@ -207,14 +207,30 @@ int main()
                 draw_cursor(input_row, input_col, input_buffer);
             }
             
-            if ((packet.keycode[0] == 0x2B || packet.keycode[0] == 0x43) && input_col < 132)
-            { // Tab (0x43) - Moves cursor forward 4 spaces
-                for (int i = 0; i < 4; i++)
-                {
+            if ((packet.keycode[0] == 0x2B || packet.keycode[0] == 0x43)) { // Tab Key
+                int spaces_to_add = 4;
+            
+                // If tab moves beyond column 132 in row 43, move to row 44
+                if (input_col + spaces_to_add >= 132 && input_row == 43) {
+                    int remaining_in_row = 132 - input_col; // Fill remaining spaces
+                    for (int i = 0; i < remaining_in_row; i++) {
+                        fbputchar(' ', input_row, input_col);
+                        input_col++;
+                    }
+                    input_col = 0;
+                    input_row = 44;
+                    spaces_to_add -= remaining_in_row; // Reduce remaining spaces
+                }
+            
+                // Apply remaining tab spaces (ensure we don't exceed column 132 in row 44)
+                for (int i = 0; i < spaces_to_add && input_col < 132; i++) {
                     fbputchar(' ', input_row, input_col);
                     input_col++;
                 }
+            
+                draw_cursor(input_row, input_col, input_buffer);
             }
+            
     
             if (packet.keycode[0] == 0x50 && input_col > 2)
             { // Left Arrow (0x50)
