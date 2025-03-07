@@ -25,6 +25,10 @@ pthread_t network_thread, cursor_thread;
 void *network_thread_f(void *);
 void *cursor_blink_thread(void *);
 
+int cursor_row = 43, cursor_col = 2;
+char input_buffer[BUFFER_SIZE] = {0};
+int input_length = 0;
+
 char keycode_to_ascii(uint8_t keycode, uint8_t modifiers)
 {
     // Corrected keymap based on USB HID scan codes
