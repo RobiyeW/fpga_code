@@ -212,7 +212,7 @@ int main()
                     input_row--;  // Move up one row
                     input_col = 128;  // Go to last column
                 }
-                else if (input_col == 1 && input_row = 44) {  
+                else if (input_col == 1 && input_row == 44) {  
                     input_row++;  // Move up one row
                 }
 
