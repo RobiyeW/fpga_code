@@ -153,8 +153,7 @@ int main()
     connect(sockfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr));
 
     pthread_create(&network_thread, NULL, network_thread_f, NULL);
-    pthread_create(&cursor_thread, NULL, NULL, (void *)input_buffer);
-    pthread_detach(cursor_thread);
+    pthread_detach(network_thread);
 
     for (;;)
     {
