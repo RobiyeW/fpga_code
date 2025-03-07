@@ -230,11 +230,12 @@ int main()
                     input_col = 2; // Reset to starting column (after prompt)
                     input_row++;   // Move down one line
 
-                    // If we exceed the bottom of the display, handle scrolling or cap the row.
+                    // Handle bottom-of-screen behavior
                     if (input_row >= MAX_ROW)
                     {
-                        input_row = MAX_ROW - 1; // Adjust to keep the cursor in bounds
-                        // Optional: Implement scrolling if desired
+                        input_row = MAX_ROW - 1; // Stay at the last row
+
+                        // Optional: Scroll the screen if implemented
                         // scroll_screen();
                     }
                 }
