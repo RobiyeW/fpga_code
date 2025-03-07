@@ -228,44 +228,46 @@ void scroll_text_up() {
            fb_finfo.line_length * FONT_HEIGHT);
 }
 
-void draw_cursor(int row, int col) {
-    static int prev_row = 23, prev_col = 2;  
+void *draw_cursor_thread(void *arg) {
+    int row = 23, col = 2;  // Cursor starts at default position
     static int blink_state = 1;
 
-    while (1) {  // Continuous blinking loop
-        // Restore previous character from input_buffer
-        if (prev_col >= 2) {
-            fbputchar(input_buffer[prev_col - 2] ? input_buffer[prev_col - 2] : ' ', prev_row, prev_col);
+    while (1) {  
+        char message[128] = {0};  
+        get_input_buffer(message, sizeof(message));
+
+        if (col >= 2) {
+            fbputchar(message[col - 2] ? message[col - 2] : ' ', row, col);
         }
 
-        // Toggle cursor visibility
         if (blink_state) {
-            fbputchar('_', row, col);  // Draw cursor
+            fbputchar('_', row, col);
         } else {
-            fbputchar(' ', row, col);  // Erase cursor
+            fbputchar(' ', row, col);
         }
         blink_state = !blink_state;
 
-        // Update previous position
-        prev_row = row;
-        prev_col = col;
-
-        usleep(500000); // 500ms delay for blinking
+        usleep(500000); // 500ms blink interval
     }
+    return NULL;
 }
 
-// Function to store character in input buffer
+
 void store_input_char(int col, char c) {
-    if (col - 2 < 127) {  // Avoid buffer overflow
+    if (col - 2 >= 0 && col - 2 < sizeof(input_buffer) - 1) {
         input_buffer[col - 2] = c;
-        input_buffer[col - 1] = '\0'; // Null-terminate
+        input_buffer[col - 1] = '\0';  // Ensure null termination
     }
 }
+
 
 void get_input_buffer(char *dest, int size) {
-    strncpy(dest, input_buffer, size - 1);  // Copy stored input to provided buffer
-    dest[size - 1] = '\0'; // Ensure null termination
+    if (dest != NULL && size > 0) {
+        strncpy(dest, input_buffer, size - 1);
+        dest[size - 1] = '\0';
+    }
 }
+
 
 
 // Function to clear input buffer

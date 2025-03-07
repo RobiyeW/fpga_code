@@ -120,8 +120,9 @@ int main()
 
     // Start the cursor blinking
     pthread_t cursor_thread;
-    pthread_create(&cursor_thread, NULL, (void *(*)(void *))draw_cursor, NULL);
+    pthread_create(&cursor_thread, NULL, draw_cursor_thread, NULL);
     pthread_detach(cursor_thread);
+    
 
     for (;;)
     {
@@ -166,16 +167,13 @@ int main()
             
             if (packet.keycode[0] == 0x28) // Enter key
             { 
-                char message[128]; // Local buffer to fetch stored input
-                memset(message, 0, sizeof(message));
-
-                // Fetch stored input
+                char message[128] = {0};
                 get_input_buffer(message, sizeof(message));
-
                 
                 send(sockfd, message, strlen(message), 0);
                 display_received_message(message);
-                clear_input_buffer(); // 🔹 Reset buffer inside `fbputchar.c`
+                clear_input_buffer();
+                
                 fbclear_input_area();
                 fbputs("> ", 23, 0);
                 input_col = 2;
