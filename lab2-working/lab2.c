@@ -16,7 +16,9 @@
 
 #define SERVER_HOST "128.59.19.114"
 #define SERVER_PORT 42000
-#define BUFFER_SIZE 128
+#define BUFFER_SIZE 264  // Matches input_buffer size
+#define MAX_COLUMNS 132
+#define MAX_ROWS 2  // Two-line input area
 
 int sockfd;
 struct libusb_device_handle *keyboard;
