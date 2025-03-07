@@ -12,15 +12,11 @@
 #define FONT_WIDTH 8
 #define FONT_HEIGHT 16
 #define BITS_PER_PIXEL 32
-#define MAX_COLUMNS 132
-#define MAX_ROWS 2 // Expanded input to span 2 rows
 
 struct fb_var_screeninfo fb_vinfo;
 struct fb_fix_screeninfo fb_finfo;
 unsigned char *framebuffer;
-static char input_buffer[264];
-static int cursor_row = 43, cursor_col = 2;
-static int input_length = 0;
+static char input_buffer[128];
 static unsigned char font[] = {
   0x00, 0x00, 0x7e, 0xc3, 0x99, 0x99, 0xf3, 0xe7, 0xe7, 0xff, 0xe7, 0xe7, 0x7e, 0x00, 0x00, 0x00,
   0x00, 0x00, 0x00, 0x00, 0x00, 0x76, 0xdc, 0x00, 0x76, 0xdc, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -207,8 +203,8 @@ void fbputs(const char *s, int row, int col) {
 }
 
 void fbclear_input_area() {
-    for (int row = 43; row < 43 + MAX_ROWS; row++) {
-        for (int col = 0; col < MAX_COLUMNS; col++) {
+    for (int row = 43; row <= 44; row++) {
+        for (int col = 0; col < 64; col++) {
             fbputchar(' ', row, col);
         }
     }
@@ -231,48 +227,19 @@ void scroll_text_up() {
            fb_finfo.line_length * FONT_HEIGHT);
 }
 
-void draw_cursor() {
-    fbputchar('_', cursor_row, cursor_col);
-}
+void draw_cursor(int row, int col, char *input_buffer) {
+    static int prev_row = 43, prev_col = 2;
 
-void handle_input_char(char c) {
-    if (c == '\b' && input_length > 0) { // Handle backspace
-        input_length--;
-        input_buffer[input_length] = '\0';
-        cursor_col--;
-        if (cursor_col < 2 && cursor_row > 43) {
-            cursor_row--;
-            cursor_col = MAX_COLUMNS - 1;
-        }
-        fbputchar(' ', cursor_row, cursor_col); // Erase character
-    } else if (c == '\n' && cursor_row < 44) { // Move to next line
-        cursor_row++;
-        cursor_col = 2;
-    } else if (input_length < sizeof(input_buffer) - 1) { // Normal character input
-        input_buffer[input_length++] = c;
-        fbputchar(c, cursor_row, cursor_col);
-        cursor_col++;
-        if (cursor_col >= MAX_COLUMNS && cursor_row < 44) {
-            cursor_row++;
-            cursor_col = 2;
-        }
+    // Restore previous character instead of drawing cursor in the buffer
+    if (prev_col >= 2) {
+        fbputchar(input_buffer[prev_col - 2] ? input_buffer[prev_col - 2] : ' ', prev_row, prev_col);
     }
-    draw_cursor();
-}
 
-void process_user_input(const char *user_input) {
-    while (*user_input) {
-        handle_input_char(*user_input++);
-    }
-}
+    // Draw cursor but do NOT modify input_buffer
+    fbputchar('_', row, col);
 
-void reset_input() {
-    memset(input_buffer, 0, sizeof(input_buffer));
-    input_length = 0;
-    cursor_row = 43;
-    cursor_col = 2;
-    fbclear_input_area();
-    draw_cursor();
+    prev_row = row;
+    prev_col = col;
 }
 
 
