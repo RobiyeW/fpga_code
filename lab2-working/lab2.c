@@ -186,25 +186,35 @@ int main() {
                 }
             }
 
-            // Handle Enter key (0x28)
-            if (packet.keycode[0] == 0x28) {  
-                send(sockfd, input_buffer, input_length, 0);
-                display_received_message(input_buffer);
-                reset_input();
-                fbputs("> ", 43, 0);
+            if (packet.keycode[0] == 0x28) { // Enter key
+                if (input_col > 2) {  // Only process if there is user input
+                    input_buffer[input_length] = '\0';  // ✅ Ensure input is null-terminated before sending
+                    send(sockfd, input_buffer, strlen(input_buffer), 0); // ✅ Send only the typed characters
+                    display_received_message(input_buffer);  // ✅ Display message in UI
+            
+                    // ✅ Reset input buffer and cursor after sending
+                    memset(input_buffer, 0, sizeof(input_buffer));
+                    input_length = 0;
+                    input_col = 2;
+                    cursor_row = 43;
+                    fbclear_input_area();  
+                    fbputs("> ", 43, 0);  // ✅ Display prompt for new input
+                }
             }
+            
 
-            // Handle Left Arrow (0x50)
-            if (packet.keycode[0] == 0x50) {  
-                cursor_col--;
+            // Left Arrow Key (0x50)
+            if (packet.keycode[0] == 0x50 && cursor_col > 2) {  
+                cursor_col--;  // Move cursor left
                 draw_cursor();
             }
 
-            // Handle Right Arrow (0x4F)
-            if (packet.keycode[0] == 0x4F) {  
-                cursor_col++;
+            // Right Arrow Key (0x4F)
+            if (packet.keycode[0] == 0x4F && cursor_col < input_length + 2) {  
+                cursor_col++;  // Move cursor right
                 draw_cursor();
             }
+
 
             // Handle Tab Key (0x2B)
             if (packet.keycode[0] == 0x2B) {  
