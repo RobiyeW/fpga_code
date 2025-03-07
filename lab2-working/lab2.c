@@ -100,8 +100,9 @@ void *network_thread_f(void *ignored)
 
 void *cursor_blink_thread(void *arg)
 {
+    char *input_buffer = (char *)arg;  // Correctly cast void* to char*
     int blink_state = 1;
-    char *input_buffer = (char *)arg;
+    
     while (1)
     {
         if (blink_state)
@@ -117,6 +118,7 @@ void *cursor_blink_thread(void *arg)
     }
     return NULL;
 }
+
 
 int main()
 {
@@ -137,7 +139,7 @@ int main()
     connect(sockfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr));
 
     pthread_create(&network_thread, NULL, network_thread_f, NULL);
-    pthread_create(&cursor_thread, NULL, cursor_blink_thread, NULL);
+    pthread_create(&cursor_thread, NULL, cursor_blink_thread, (void *)input_buffer);
     pthread_detach(cursor_thread);
 
     for (;;)
@@ -154,11 +156,12 @@ int main()
                 draw_cursor(input_row, input_col, input_buffer);  // 🔹 Update cursor immediately
             }
             if ((packet.keycode[0] == 0x2A || packet.keycode[0] == 0x42) && input_col > 2)
-            { // Backspace (Handle both `0x2A` and `0x42`)
+            {
                 input_col--;
                 fbputchar(' ', input_row, input_col);  // Clear character from framebuffer
-                input_buffer[input_col - 2] = '\0';   // Remove from buffer
+                input_buffer[input_col - 2] = '\0';   // Remove from buffer safely
             }
+            
             if ((packet.keycode[0] == 0x2B || packet.keycode[0] == 0x43) && input_col < 60)
             { // Tab (0x43) - Moves cursor forward 4 spaces
                 for (int i = 0; i < 4; i++)
