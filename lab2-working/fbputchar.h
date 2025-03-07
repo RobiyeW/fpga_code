@@ -1,11 +1,11 @@
 #ifndef _FBPUTCHAR_H
 #  define _FBPUTCHAR_H
 
-#define FBOPEN_DEV -1          /* Couldn't open the device */
-#define FBOPEN_FSCREENINFO -2  /* Couldn't read the fixed info */
-#define FBOPEN_VSCREENINFO -3  /* Couldn't read the variable info */
-#define FBOPEN_MMAP -4         /* Couldn't mmap the framebuffer memory */
-#define FBOPEN_BPP -5          /* Unexpected bits-per-pixel */
+#define FBOPEN_DEV -1          
+#define FBOPEN_FSCREENINFO -2  
+#define FBOPEN_VSCREENINFO -3  
+#define FBOPEN_MMAP -4         
+#define FBOPEN_BPP -5          
 
 extern int fbopen(void);
 extern void fbputchar(char, int, int);
@@ -14,8 +14,8 @@ extern void fbclear(void);
 extern void fbclear_input_area(void);
 extern void display_received_message(const char *);
 extern void scroll_text_up(void);
-extern void draw_cursor(int, int, char *input_buffer);
-
-
+extern void draw_cursor(void);
+extern void handle_input_char(char);
+extern void reset_input(void);
 
 #endif

@@ -34,7 +34,7 @@ char keycode_to_ascii(uint8_t keycode, uint8_t modifiers)
         'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', // 14-23
         'u', 'v', 'w', 'x', 'y', 'z', '1', '2', '3', '4', // 24-33
         '5', '6', '7', '8', '9', '0', '-', '=', '[', ' ', // 34-43
-        '\t', '-', '=', '[', ']', '\\', '/', ' '          // 44-50 (Space at 50)
+        ' ', '-', '=', '[', ']', '\\', '/', ' '          // 44-50 (Space at 50)
     };
 
     static const char shift_keymap[] = {
@@ -60,6 +60,8 @@ char keycode_to_ascii(uint8_t keycode, uint8_t modifiers)
         return '\b'; // Backspace
     case 0x28:
         return '\n'; // Enter
+    case 0x2B:
+        return '\t';
     case 0x2C:
         return ' '; // Space
     // Handle special characters when Shift is toggled
@@ -134,28 +136,17 @@ void *network_thread_f(void *ignored)
 //     return NULL;
 // }
 
-int main()
-{
-    int col;
+
+int main() {
     struct sockaddr_in serv_addr;
     struct usb_keyboard_packet packet;
-    int transferred, input_col = 2, input_row = 43;
-    char input_buffer[BUFFER_SIZE] = {0};
-
-    // for (col = 0; col < 132; col++) {
-    //     fbputchar('*', 42, col);
-    // }
+    int transferred;
 
     fbopen();
     fbclear();
 
-    for (col = 0; col < 130; col++)
-    {
-        fbputchar('*', 42, col);
-    }
-
     fbputs("> ", 43, 0);
-
+    
     keyboard = openkeyboard(&endpoint_address);
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     serv_addr.sin_family = AF_INET;
@@ -166,101 +157,68 @@ int main()
     pthread_create(&network_thread, NULL, network_thread_f, NULL);
     pthread_detach(network_thread);
 
-    for (;;)
-    {
+    for (;;) {
         libusb_interrupt_transfer(keyboard, endpoint_address, (unsigned char *)&packet, sizeof(packet), &transferred, 0);
-        if (transferred == sizeof(packet))
-        {
+        if (transferred == sizeof(packet)) {
             char c = keycode_to_ascii(packet.keycode[0], packet.modifiers);
-            if (c && strlen(input_buffer) < BUFFER_SIZE - 1)
-            { 
-                // Store character in buffer
-                input_buffer[strlen(input_buffer)] = c;
-                
-                // Print character on screen
-                fbputchar(c, input_row, input_col);
-                input_col++;
-
-                // Wrap to next line when reaching column limit (assume 132 columns)
-                if (input_col >= 132)
-                {
-                    input_col = 0; // Reset column to beginning
-                    input_row = 44; // Move cursor to the second row
-                }
-
-                draw_cursor(input_row, input_col, input_buffer);
+            
+            // Handle standard character input
+            if (c && input_length < BUFFER_SIZE - 1) {
+                handle_input_char(c);
             }
 
-            // Handle backspace (0x2A)
-            if (packet.keycode[0] == 0x2A && strlen(input_buffer) > 0)
-            {
-                input_col--;
-
-                if (input_col < 0)  // Move cursor back to previous row if needed
-                {
-                    input_col = 132; // Move to last column of previous row
-                    input_row = 43;
-                }
-
-                fbputchar(' ', input_row, input_col); // Clear character visually
-                input_buffer[strlen(input_buffer) - 1] = '\0'; // Remove from buffer
-                draw_cursor(input_row, input_col, input_buffer);
-            }
-            
-            if ((packet.keycode[0] == 0x2B || packet.keycode[0] == 0x43)) { // Tab Key
-                int spaces_to_add = 4;
-            
-                // If tab moves beyond column 132 in row 43, move to row 44
-                if (input_col + spaces_to_add >= 132 && input_row == 43) {
-                    int remaining_in_row = 132 - input_col; // Fill remaining spaces
-                    for (int i = 0; i < remaining_in_row; i++) {
-                        fbputchar(' ', input_row, input_col);
-                        input_col++;
+            // Handle backspace
+            if (packet.keycode[0] == 0x2A) {  
+                if (input_length > 0) {
+                    input_length--;
+                    cursor_col--;
+                    if (cursor_col < 2 && cursor_row > 43) {
+                        cursor_row--;
+                        cursor_col = MAX_COLUMNS - 1;
                     }
-                    input_col = 0;
-                    input_row = 44;
-                    spaces_to_add -= remaining_in_row; // Reduce remaining spaces
+                    fbputchar(' ', cursor_row, cursor_col);
                 }
-            
-                // Apply remaining tab spaces (ensure we don't exceed column 132 in row 44)
-                for (int i = 0; i < spaces_to_add && input_col < 132; i++) {
-                    fbputchar(' ', input_row, input_col);
-                    input_col++;
-                }
-            
-                draw_cursor(input_row, input_col, input_buffer);
             }
-            
-    
-            if (packet.keycode[0] == 0x50 && input_col > 2)
-            { // Left Arrow (0x50)
-                fbputchar(input_buffer[input_col - 2], input_row, input_col);  // 🔹 Restore original character
-                input_col--;  // 🔹 Move left
-                draw_cursor(input_row, input_col, input_buffer);  // 🔹 Redraw cursor at new position
-            }
-            if (packet.keycode[0] == 0x4F && input_col < 132 && input_buffer[input_col - 2] != '\0')
-            { // Right Arrow (0x4F)
-                fbputchar(input_buffer[input_col - 2], input_row, input_col);  // 🔹 Restore original character
-                input_col++;  // 🔹 Move right
-                draw_cursor(input_row, input_col, input_buffer);  // 🔹 Redraw cursor at new position
-            }
-            
-            // Handle Enter (0x28)
-            if (packet.keycode[0] == 0x28)
-            {
-                send(sockfd, input_buffer, strlen(input_buffer), 0);
+
+            // Handle Enter key (0x28)
+            if (packet.keycode[0] == 0x28) {  
+                send(sockfd, input_buffer, input_length, 0);
                 display_received_message(input_buffer);
-                memset(input_buffer, 0, sizeof(input_buffer));
-                fbclear_input_area();
+                reset_input();
                 fbputs("> ", 43, 0);
-                input_col = 0;
-                input_row = 43; // Reset cursor to first input row
             }
-            
-            usleep(10000); // 🔹 Small delay to ensure rendering catches up
-            fbputs("> ", 43, 0);
-            draw_cursor(input_row, input_col, input_buffer);
-            
+
+            // Handle Left Arrow (0x50)
+            if (packet.keycode[0] == 0x50 && cursor_col > 2) {  
+                cursor_col--;
+                draw_cursor();
+            }
+
+            // Handle Right Arrow (0x4F)
+            if (packet.keycode[0] == 0x4F && cursor_col < input_length + 2) {  
+                cursor_col++;
+                draw_cursor();
+            }
+
+            // Handle Tab Key (0x2B)
+            if (packet.keycode[0] == 0x2B) {  
+                int spaces_to_add = 4;
+                if (cursor_col + spaces_to_add >= MAX_COLUMNS && cursor_row == 43) {
+                    int remaining_in_row = MAX_COLUMNS - cursor_col;
+                    for (int i = 0; i < remaining_in_row; i++) {
+                        fbputchar(' ', cursor_row, cursor_col++);
+                    }
+                    cursor_col = 2;
+                    cursor_row = 44;
+                    spaces_to_add -= remaining_in_row;
+                }
+                for (int i = 0; i < spaces_to_add && cursor_col < MAX_COLUMNS; i++) {
+                    fbputchar(' ', cursor_row, cursor_col++);
+                }
+                draw_cursor();
+            }
+
+            draw_cursor();
         }
     }
 
