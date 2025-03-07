@@ -6,7 +6,6 @@
 #include <sys/mman.h>
 #include <sys/ioctl.h>
 #include <linux/fb.h>
-#include <unistd.h>
 
 #define FBDEV "/dev/fb0"
 
@@ -17,7 +16,6 @@
 struct fb_var_screeninfo fb_vinfo;
 struct fb_fix_screeninfo fb_finfo;
 unsigned char *framebuffer;
-static char input_buffer[128];
 static unsigned char font[] = {
   0x00, 0x00, 0x7e, 0xc3, 0x99, 0x99, 0xf3, 0xe7, 0xe7, 0xff, 0xe7, 0xe7, 0x7e, 0x00, 0x00, 0x00,
   0x00, 0x00, 0x00, 0x00, 0x00, 0x76, 0xdc, 0x00, 0x76, 0xdc, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -228,51 +226,20 @@ void scroll_text_up() {
            fb_finfo.line_length * FONT_HEIGHT);
 }
 
-void *draw_cursor_thread(void *arg) {
-    int row = 23, col = 2;  // Cursor starts at default position
-    static int blink_state = 1;
+void draw_cursor(int row, int col) {
+    static int prev_row = 23, prev_col = 2;  // 🔹 Keep track of previous position
 
-    while (1) {  
-        char message[128] = {0};  
-        get_input_buffer(message, sizeof(message));
-
-        if (col >= 2) {
-            fbputchar(message[col - 2] ? message[col - 2] : ' ', row, col);
-        }
-
-        if (blink_state) {
-            fbputchar('_', row, col);
-        } else {
-            fbputchar(' ', row, col);
-        }
-        blink_state = !blink_state;
-
-        usleep(500000); // 500ms blink interval
+    // 🔹 Restore character at old cursor position
+    if (prev_col >= 2) {
+        fbputchar(input_buffer[prev_col - 2] ? input_buffer[prev_col - 2] : ' ', prev_row, prev_col);
     }
-    return NULL;
-}
 
+    // 🔹 Draw new cursor
+    fbputchar('_', row, col);
 
-void store_input_char(int col, char c) {
-    if (col - 2 >= 0 && col - 2 < sizeof(input_buffer) - 1) {
-        input_buffer[col - 2] = c;
-        input_buffer[col - 1] = '\0';  // Ensure null termination
-    }
-}
-
-
-void get_input_buffer(char *dest, int size) {
-    if (dest != NULL && size > 0) {
-        strncpy(dest, input_buffer, size - 1);
-        dest[size - 1] = '\0';
-    }
-}
-
-
-
-// Function to clear input buffer
-void clear_input_buffer() {
-    memset(input_buffer, 0, sizeof(input_buffer));
+    // 🔹 Update previous position
+    prev_row = row;
+    prev_col = col;
 }
 
 
@@ -282,5 +249,4 @@ void clear_input_buffer() {
 od --address-radix=n --width=16 -v -t x1 -j 4 -N 2048 lat0-16.psfu
 
 */
-
 
