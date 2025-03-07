@@ -43,7 +43,7 @@ char keycode_to_ascii(uint8_t keycode, uint8_t modifiers)
         'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', // 14-23
         'U', 'V', 'W', 'X', 'Y', 'Z', '!', '@', '#', '$', // 24-33
         '%', '^', '&', '*', '(', ')', '_', '+', '{', '}', // 34-43
-        '|', '_', '+', '~', '<', '>', '?', ' '            // 44-50 (Space at 50)
+        '|', '_', '+', '~', '}', '>', '?', ' '            // 44-50 (Space at 50)
     };
 
     // Check if the keycode is in the valid range (4-50)
