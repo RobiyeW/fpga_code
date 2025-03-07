@@ -171,6 +171,7 @@ int main()
                 input_buffer[input_col - 2] = c;  
                 fbputchar(c, input_row, input_col);
                 input_col++;
+                printf("%s\n", input_buffer);
                 draw_cursor(input_row, input_col, input_buffer);  // 🔹 Update cursor immediately
             }
             if ((packet.keycode[0] == 0x2A || packet.keycode[0] == 0x42) && input_col > 2)
