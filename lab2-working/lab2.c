@@ -170,9 +170,9 @@ int main()
                     fbputchar(input_buffer[(input_row - 43) * 128 + (input_col - 2)], input_row, input_col);
                     input_col--; // Move left within the row
                 } else if (input_row == 43 && input_col >= 127) {
-                    input_row = 44
+                    input_row = 44;
                 } else if (input_row == 44 && input_col < 0) {
-                    input_row = 43
+                    input_row = 43;
                 }
                 else if (input_row == 44) {
                     fbputchar(input_buffer[(input_row - 44) * 128 + (input_col - 2)], input_row, input_col);
@@ -187,9 +187,9 @@ int main()
                     fbputchar(input_buffer[(input_row - 43) * 128 + (input_col - 2)], input_row, input_col);
                     input_col++; 
                 } else if (input_row == 43 && input_col >= 127) {
-                    input_row = 44
+                    input_row = 44;
                 } else if (input_row == 44 && input_col < 0) {
-                    input_row = 43
+                    input_row = 43;
                 }
                 else if (input_row == 44) {
                     fbputchar(input_buffer[(input_row - 44) * 128 + (input_col - 2)], input_row, input_col);
