@@ -181,7 +181,7 @@ int main()
                 for (int i = 0; i < 4; i++)
                 {
                     fbputchar(' ', input_row, input_col);
-                    input_buffer[input_col - 2] = ''; 
+                    input_buffer[input_col - 2] = ' '; 
                     input_col++;
                 }
             }
