@@ -1,4 +1,5 @@
 #include <string.h>
+#include <stdint.h>
 #include "fbputchar.h"
 #include <sys/types.h>
 #include <sys/stat.h>
