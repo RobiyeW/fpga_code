@@ -98,42 +98,6 @@ void *network_thread_f(void *ignored)
     return NULL;
 }
 
-// void *cursor_blink_thread(void *arg)
-// {
-//     char *input_buffer = (char *)arg;  // Correctly cast void* to char*
-//     static int prev_row = 23, prev_col = 2;  // 🔹 Keep track of previous position
-//     int row = 23, col = 2;
-//     int blink_state = 1;
-
-//     while (1)
-//     {
-//         // 🔹 Restore character at old cursor position
-//         if (prev_col >= 2) {
-//             fbputchar(input_buffer[prev_col - 2] ? input_buffer[prev_col - 2] : ' ', prev_row, prev_col);
-//         }
-
-//         // 🔹 Toggle cursor visibility
-//         if (blink_state)
-//         {
-//             fbputchar('_', row, col);
-//         }
-//         else
-//         {
-//             fbputchar(' ', row, col);
-//         }
-        
-//         blink_state = !blink_state;
-
-//         // 🔹 Update previous position
-//         prev_row = row;
-//         prev_col = col;
-
-//         usleep(500000); // 500ms blink interval
-//     }
-
-//     return NULL;
-// }
-
 int main()
 {
     int col;
