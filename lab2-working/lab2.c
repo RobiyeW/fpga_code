@@ -164,18 +164,32 @@ int main()
                 }
             }
     
-            if (packet.keycode[0] == 0x50 && input_col > 2)
-            { // Left Arrow (0x50)
-                fbputchar(input_buffer[input_col - 2], input_row, input_col);  // 🔹 Restore original character
-                input_col--;  // 🔹 Move left
-                draw_cursor(input_row+1, input_col, input_buffer);  // 🔹 Redraw cursor at new position
+            // Handle Left Arrow Key (0x50)
+            if (packet.keycode[0] == 0x50) {
+                if (input_col > 2) {
+                    fbputchar(input_buffer[(input_row - 43) * 132 + (input_col - 2)], input_row, input_col);
+                    input_col--; // Move left within the row
+                } else if (input_row == 44) {
+                    // Move to the end of the previous row if at the start of row 44
+                    input_row = 43;
+                    input_col = 128; // Last valid column in row 43
+                }
+                draw_cursor(input_row, input_col, input_buffer);
             }
-            if (packet.keycode[0] == 0x4F && input_col < 128 && input_buffer[input_col - 2] != '\0')
-            { // Right Arrow (0x4F)
-                fbputchar(input_buffer[input_col - 2], input_row, input_col);  // 🔹 Restore original character
-                input_col++;  // 🔹 Move right
-                draw_cursor(input_row+1, input_col, input_buffer);  // 🔹 Redraw cursor at new position
+
+            // Handle Right Arrow Key (0x4F)
+            if (packet.keycode[0] == 0x4F) {
+                if (input_col < 128 && input_buffer[(input_row - 43) * 132 + (input_col - 2)] != '\0') {
+                    fbputchar(input_buffer[(input_row - 43) * 132 + (input_col - 2)], input_row, input_col);
+                    input_col++; // Move right within the row
+                } else if (input_row == 43 && input_col >= 128) {
+                    // Move to the start of the next row if at the end of row 43
+                    input_row = 44;
+                    input_col = 0;
+                }
+                draw_cursor(input_row, input_col, input_buffer);
             }
+
             
             if (packet.keycode[0] == 0x28) { // Enter key
                 input_buffer[input_col - 3] = '\0';  // ✅ Ensure cursor is removed before sending
