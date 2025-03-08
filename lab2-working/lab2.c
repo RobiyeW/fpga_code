@@ -178,7 +178,7 @@ int main()
 
             // Handle Right Arrow Key (0x4F)
             if (packet.keycode[0] == 0x4F) {
-                if (input_col < 128 && input_buffer[(input_row - 43) * 132 + (input_col - 2)] != '\0') {
+                if (input_col < 128) {
                     fbputchar(input_buffer[(input_row - 43) * 132 + (input_col - 2)], input_row, input_col);
                     input_col++; // Move right within the row
                 } else if (input_row == 43 && input_col >= 128) {
