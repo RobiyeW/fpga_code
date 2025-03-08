@@ -171,8 +171,7 @@ int main()
                     input_col--; // Move left within the row
                 } else if (input_row == 44) {
                     // Move to the end of the previous row if at the start of row 44
-                    input_row = 43;
-                    input_col = 128; // Last valid column in row 43
+                    input_row = 44;
                 }
                 draw_cursor(input_row, input_col, input_buffer);
             }
@@ -185,7 +184,6 @@ int main()
                 } else if (input_row == 43 && input_col >= 128) {
                     // Move to the start of the next row if at the end of row 43
                     input_row = 44;
-                    input_col = 0;
                 }
                 draw_cursor(input_row, input_col, input_buffer);
             }
