@@ -160,6 +160,7 @@ int main()
                 for (int i = 0; i < 4; i++)
                 {
                     fbputchar(' ', input_row, input_col);
+                    input_buffer[input_col - 2] = ' '; 
                     input_col++;
                 }
             }
@@ -177,7 +178,7 @@ int main()
                     // Move left within row 43 (preventing backtracking past `> `)
                     input_col--;
                 }
-                else if (input_row == 43 && input_col > 127) {  
+                else if (input_row == 43 && input_col > 126) {  
                     // Move left within row 43 (preventing backtracking past `> `)
                     input_row = 44;
                     input_col = 0;
@@ -187,14 +188,14 @@ int main()
 
             // Handle Right Arrow Key (0x4F)
             if (packet.keycode[0] == 0x4F) {  
-                if (input_row == 43 && input_col == 127) {  
+                if (input_row == 43 && input_col == 126) {  
                     // Move from end of row 43 to start of row 44
                     input_row = 44;
                     input_col = 0;
-                } else if (input_row == 43 && input_col < 127) {  
+                } else if (input_row == 43 && input_col < 126) {  
                     // Move right within row 43
                     input_col++;
-                } else if (input_row == 44 && input_col < 127) {  
+                } else if (input_row == 44 && input_col < 126) {  
                     // Move right within row 44
                     input_col++;
                 }
