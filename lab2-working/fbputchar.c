@@ -235,18 +235,22 @@ void display_received_message(const char *message) {
 
 void scroll_text_up() {
     int row_bytes = fb_finfo.line_length * FONT_HEIGHT;
-    int num_rows = 42; // rows 0-41
-    
-    // Move rows 1-41 upward into rows 0-40
-    for (int i = 0; i < num_rows - 1; i++) {
-        memcpy(framebuffer + i * row_bytes,
-               framebuffer + (i + 1) * row_bytes,
-               row_bytes);
+    uint8_t *temp = malloc(row_bytes);
+    if (!temp) return; // Handle allocation error appropriately
+
+    // Move rows 1-41 upward into rows 0-40 one row at a time
+    for (int i = 0; i < 41; i++) {
+        // Copy row (i+1) into a temporary buffer
+        memcpy(temp, framebuffer + (i + 1) * row_bytes, row_bytes);
+        // Then copy that buffer into row i
+        memcpy(framebuffer + i * row_bytes, temp, row_bytes);
     }
-    
-    // Clear the last row (row 41) so it's truly empty
-    memset(framebuffer + (num_rows - 1) * row_bytes, 0, row_bytes);
+    free(temp);
+
+    // Clear row 41 (last row)
+    memset(framebuffer + 41 * row_bytes, 0, row_bytes);
 }
+
 
 
 
