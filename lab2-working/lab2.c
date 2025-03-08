@@ -196,14 +196,11 @@ int main()
                 draw_cursor(input_row, input_col, input_buffer);
             }
 
-
-
-
             
             if (packet.keycode[0] == 0x28) { // Enter key
                 input_buffer[input_col - 3] = '\0';  // ✅ Ensure cursor is removed before sending
                 send(sockfd, input_buffer, strlen(input_buffer), 0);
-                display_received_message(input_buffer);
+                //display_received_message(input_buffer);
                 memset(input_buffer, 0, sizeof(input_buffer));
                 fbclear_input_area();
                 fbputs("> ", 43, 0);
