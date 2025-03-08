@@ -132,7 +132,7 @@ int main()
         if (transferred == sizeof(packet))
         {
             char c = keycode_to_ascii(packet.keycode[0], packet.modifiers);
-            if (c && input_col - 2 < BUFFER_SIZE - 1)
+            if (c && input_col - 2 < BUFFER_SIZE - 2)
             { // 🔹 Ensure character is stored BEFORE moving cursor
                 input_buffer[input_col - 2] = c;  
                 fbputchar(c, input_row, input_col);
@@ -140,7 +140,7 @@ int main()
                 printf("%s\n", input_buffer);
                 draw_cursor(input_row, input_col, input_buffer);  // 🔹 Update cursor immediately
             }
-            if (c && input_col - 2 >= BUFFER_SIZE - 1)
+            if (c && input_col - 2 >= BUFFER_SIZE - 2)
             { // 🔹 Ensure character is stored BEFORE moving cursor
                 input_buffer[input_col - 2] = c;  
                 fbputchar(c, input_row+1, input_col);
