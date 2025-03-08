@@ -165,38 +165,37 @@ int main()
             }
     
             // Handle Left Arrow Key (0x50)
-            if (packet.keycode[0] == 0x50) {
-                if (input_row == 43) {
-                    fbputchar(input_buffer[(input_row - 43) * 128 + (input_col - 2)], input_row, input_col);
-                    input_col--; // Move left within the row
-                } else if (input_row == 43 && input_col >= 127) {
-                    input_row = 44;
-                } else if (input_row == 44 && input_col < 0) {
+            if (packet.keycode[0] == 0x50) {  
+                if (input_row == 44 && input_col == 0) {  
+                    // Move from start of row 44 to end of row 43
                     input_row = 43;
-                }
-                else if (input_row == 44) {
-                    fbputchar(input_buffer[(input_row - 44) * 128 + (input_col - 2)], input_row, input_col);
-                    input_col--; // Move left within the row
+                    input_col = 128;
+                } else if (input_row == 44 && input_col > 0) {  
+                    // Move left within row 44
+                    input_col--;
+                } else if (input_row == 43 && input_col > 2) {  
+                    // Move left within row 43 (starting col is 2)
+                    input_col--;
                 }
                 draw_cursor(input_row, input_col, input_buffer);
             }
 
             // Handle Right Arrow Key (0x4F)
-            if (packet.keycode[0] == 0x4F) {
-                if (input_row == 43) {
-                    fbputchar(input_buffer[(input_row - 43) * 128 + (input_col - 2)], input_row, input_col);
-                    input_col++; 
-                } else if (input_row == 43 && input_col >= 127) {
+            if (packet.keycode[0] == 0x4F) {  
+                if (input_row == 43 && input_col == 128) {  
+                    // Move from end of row 43 to start of row 44
                     input_row = 44;
-                } else if (input_row == 44 && input_col < 0) {
-                    input_row = 43;
-                }
-                else if (input_row == 44) {
-                    fbputchar(input_buffer[(input_row - 44) * 128 + (input_col - 2)], input_row, input_col);
-                    input_col++; 
+                    input_col = 0;
+                } else if (input_row == 43 && input_col < 128) {  
+                    // Move right within row 43
+                    input_col++;
+                } else if (input_row == 44 && input_col < 128) {  
+                    // Move right within row 44
+                    input_col++;
                 }
                 draw_cursor(input_row, input_col, input_buffer);
             }
+
 
 
             
