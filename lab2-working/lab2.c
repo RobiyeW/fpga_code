@@ -148,27 +148,6 @@ int main()
                 printf("%s\n", input_buffer);
                 draw_cursor(input_row+1, input_col, input_buffer);  // 🔹 Update cursor immediately
             }
-
-            if (c && input_col < 128) {  
-                // If typing in row 43 and reaching column 127, move to row 44
-                if (input_row == 43 && input_col == 127) {
-                    input_row = 44;
-                    input_col = 0;
-                }
-            
-                // Store character in buffer correctly
-                int buffer_index = (input_row == 43) ? input_col - 2 : (input_col - 2 + 128);
-                input_buffer[buffer_index] = c;
-            
-                // Print character on screen
-                fbputchar(c, input_row, input_col);
-                input_col++;
-            
-                // Move cursor after character
-                draw_cursor(input_row, input_col, input_buffer);
-            }
-
-            
             if ((packet.keycode[0] == 0x2A || packet.keycode[0] == 0x42) && input_col > 2)
             {
                 input_col--;
@@ -199,25 +178,29 @@ int main()
                     // Move left within row 43 (preventing backtracking past `> `)
                     input_col--;
                 }
+                else if (input_row == 43 && input_col > 126) {  
+                    // Move left within row 43 (preventing backtracking past `> `)
+                    input_row = 44;
+                    input_col = 0;
+                }
                 draw_cursor(input_row, input_col, input_buffer);
             }
 
             // Handle Right Arrow Key (0x4F)
             if (packet.keycode[0] == 0x4F) {  
-                if (input_row == 43 && input_col == 127) {  
+                if (input_row == 43 && input_col == 126) {  
                     // Move from end of row 43 to start of row 44
                     input_row = 44;
                     input_col = 0;
-                } else if (input_row == 43 && input_col < 127) {  
+                } else if (input_row == 43 && input_col < 126) {  
                     // Move right within row 43
                     input_col++;
-                } else if (input_row == 44 && input_col < 127) {  
+                } else if (input_row == 44 && input_col < 126) {  
                     // Move right within row 44
                     input_col++;
                 }
                 draw_cursor(input_row, input_col, input_buffer);
             }
-
 
             
             if (packet.keycode[0] == 0x28) { // Enter key

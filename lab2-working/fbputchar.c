@@ -259,14 +259,14 @@ void scroll_text_up() {
 void draw_cursor(int row, int col, char *input_buffer) {
     static int prev_row = 43, prev_col = 2;
 
-    // Restore previous character from input buffer before drawing cursor
+    // Restore the previous character in the buffer
     if (prev_col >= 2) {
         int buffer_index = (prev_row == 43) ? prev_col - 2 : prev_col - 2 + 128;
-        fbputchar(input_buffer[buffer_index] ? input_buffer[buffer_index] : ' ', prev_row, prev_col);
+        fbputchar(input_buffer[buffer_index] ? input_buffer[buffer_index] : ' ', row, prev_col);
     }
 
-    // Move to row 44 when exceeding col 127 in row 43
-    if (row == 43 && col > 127) {
+    // Move to row 44 when exceeding col 128 in row 43
+    if (row == 43 && col > 128) {
         row = 44;
         col = 0;
     }
@@ -274,12 +274,12 @@ void draw_cursor(int row, int col, char *input_buffer) {
     // Move to row 43 when moving left past col 0 in row 44
     if (row == 44 && col < 0) {
         row = 43;
-        col = 127;
+        col = 128;
     }
 
     // Keep cursor within row limits
-    if (row == 43 && col < 2) col = 2;  // Prevent moving before `> ` prompt
-    if (row == 44 && col > 127) col = 127;  // Prevent exceeding col in row 44
+    if (row == 43 && col < 2) col = 2;  // Prevent moving before the `> ` prompt
+    if (row == 44 && col > 128) col = 128;  // Prevent exceeding max col in row 44
 
     // Draw cursor at the new position
     fbputchar('_', row, col);
@@ -288,7 +288,6 @@ void draw_cursor(int row, int col, char *input_buffer) {
     prev_row = row;
     prev_col = col;
 }
-
 
 
 
