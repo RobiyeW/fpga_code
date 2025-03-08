@@ -221,7 +221,7 @@ void display_received_message(const char *message) {
 }
 
 void scroll_text_up() {
-    int scroll_region_height = 42 * FONT_HEIGHT; // Only scroll rows 0-41
+    int scroll_region_height = 84 * FONT_HEIGHT; // Only scroll rows 0-41
 
     // Move the framebuffer content up only for rows 0-41
     memmove(framebuffer, 
