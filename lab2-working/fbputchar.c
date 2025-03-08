@@ -220,18 +220,33 @@ void display_received_message(const char *message) {
     }
 }
 
-void scroll_text_up() {
-    int scroll_region_height = 42 * FONT_HEIGHT; // Only scroll rows 0-41
+// void scroll_text_up() {
+//     int scroll_region_height = 42 * FONT_HEIGHT; // Only scroll rows 0-41
 
-    // Move the framebuffer content up only for rows 0-41
+//     // Move the framebuffer content up only for rows 0-41
+//     memmove(framebuffer, 
+//             framebuffer + fb_finfo.line_length * FONT_HEIGHT, 
+//             fb_finfo.line_length * (scroll_region_height - FONT_HEIGHT));
+
+//     // Clear only the last row of the scrollable area (row 41)
+//     memset(framebuffer + fb_finfo.line_length * (scroll_region_height - FONT_HEIGHT), 
+//            0, fb_finfo.line_length * FONT_HEIGHT);
+// }
+
+void scroll_text_up() {
+    int scroll_region_height = 42 * FONT_HEIGHT; // scrolling rows 0–41 (42 rows)
+
+    // Shift rows 1–41 upward into rows 0–40.
+    // This effectively deletes row 0, as its content is replaced by row 1.
     memmove(framebuffer, 
             framebuffer + fb_finfo.line_length * FONT_HEIGHT, 
             fb_finfo.line_length * (scroll_region_height - FONT_HEIGHT));
 
-    // Clear only the last row of the scrollable area (row 41)
+    // Clear row 41 (the last row) so it appears empty.
     memset(framebuffer + fb_finfo.line_length * (scroll_region_height - FONT_HEIGHT), 
            0, fb_finfo.line_length * FONT_HEIGHT);
 }
+
 
 
 void draw_cursor(int row, int col, char *input_buffer) {
