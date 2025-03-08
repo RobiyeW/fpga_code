@@ -215,15 +215,17 @@ void display_received_message(const char *message) {
     fbputs(message, message_row, 0);
     message_row++;
     if (message_row > 21) {
-        scrollclear_above_row_41();
+        scroll_text_up();
         message_row--;
     }
 }
-void clear_above_row_41() {
-    int clear_height = 41 * FONT_HEIGHT;  // Height covering rows 0 to 40
-    memset(framebuffer, 0, fb_finfo.line_length * clear_height);
-}
 
+void scroll_text_up() {
+    memmove(framebuffer, framebuffer + fb_finfo.line_length * FONT_HEIGHT,
+            fb_finfo.line_length * (fb_vinfo.yres - FONT_HEIGHT));
+    memset(framebuffer + fb_finfo.line_length * (fb_vinfo.yres - FONT_HEIGHT), 0,
+           fb_finfo.line_length * FONT_HEIGHT);
+}
 
 void draw_cursor(int row, int col, char *input_buffer) {
     static int prev_row = 43, prev_col = 2;
@@ -243,7 +245,7 @@ void draw_cursor(int row, int col, char *input_buffer) {
     // Handle cursor movement back to row 43 when moving left past col 0 in row 44
     if (col < 0 && row == 44) {
         row = 43;
-        col = 128;
+        col = 126;
     }
 
     // Draw cursor at the correct position

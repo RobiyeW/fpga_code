@@ -13,7 +13,7 @@ extern void fbputs(const char *, int, int);
 extern void fbclear(void);
 extern void fbclear_input_area(void);
 extern void display_received_message(const char *);
-extern void clear_above_row_41(void);
+extern void scroll_text_up(void);
 extern void draw_cursor(int, int, char *input_buffer);
 
 
