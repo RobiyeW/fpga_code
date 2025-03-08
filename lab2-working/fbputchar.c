@@ -234,18 +234,20 @@ void display_received_message(const char *message) {
 // }
 
 void scroll_text_up() {
-    int scroll_region_height = 42 * FONT_HEIGHT; // scrolling rows 0–41 (42 rows)
-
-    // Shift rows 1–41 upward into rows 0–40.
-    // This effectively deletes row 0, as its content is replaced by row 1.
-    memmove(framebuffer, 
-            framebuffer + fb_finfo.line_length * FONT_HEIGHT, 
-            fb_finfo.line_length * (scroll_region_height - FONT_HEIGHT));
-
-    // Clear row 41 (the last row) so it appears empty.
-    memset(framebuffer + fb_finfo.line_length * (scroll_region_height - FONT_HEIGHT), 
-           0, fb_finfo.line_length * FONT_HEIGHT);
+    int row_bytes = fb_finfo.line_length * FONT_HEIGHT;
+    int num_rows = 42; // rows 0-41
+    
+    // Move rows 1-41 upward into rows 0-40
+    for (int i = 0; i < num_rows - 1; i++) {
+        memcpy(framebuffer + i * row_bytes,
+               framebuffer + (i + 1) * row_bytes,
+               row_bytes);
+    }
+    
+    // Clear the last row (row 41) so it's truly empty
+    memset(framebuffer + (num_rows - 1) * row_bytes, 0, row_bytes);
 }
+
 
 
 
