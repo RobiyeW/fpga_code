@@ -221,11 +221,18 @@ void display_received_message(const char *message) {
 }
 
 void scroll_text_up() {
-    memmove(framebuffer, framebuffer + fb_finfo.line_length * FONT_HEIGHT,
-            fb_finfo.line_length * (fb_vinfo.yres - FONT_HEIGHT));
-    memset(framebuffer + fb_finfo.line_length * (fb_vinfo.yres - FONT_HEIGHT), 0,
-           fb_finfo.line_length * FONT_HEIGHT);
+    int scroll_region_height = 42 * FONT_HEIGHT; // Only scroll rows 0-41
+
+    // Move the framebuffer content up only for rows 0-41
+    memmove(framebuffer, 
+            framebuffer + fb_finfo.line_length * FONT_HEIGHT, 
+            fb_finfo.line_length * (scroll_region_height - FONT_HEIGHT));
+
+    // Clear only the last row of the scrollable area (row 41)
+    memset(framebuffer + fb_finfo.line_length * (scroll_region_height - FONT_HEIGHT), 
+           0, fb_finfo.line_length * FONT_HEIGHT);
 }
+
 
 void draw_cursor(int row, int col, char *input_buffer) {
     static int prev_row = 43, prev_col = 2;
