@@ -193,24 +193,27 @@ int main()
                 if (input_col > 2) {
                     fbputchar(input_buffer[(input_row - 43) * 132 + (input_col - 2)], input_row, input_col);
                     input_col--; // Move left within the row
-                } else if (input_row == 44) {
-                    // Move to the end of the previous row if at the start of row 44
-                    input_row = 44;
+                } else if (input_row > 43) {
+                    // Move to the end of the previous row if at the start of row 44 or above
+                    input_row--;
+                    input_col = 132 - 1; // Move to the end of the previous row
                 }
                 draw_cursor(input_row, input_col, input_buffer);
             }
 
             // Handle Right Arrow Key (0x4F)
             if (packet.keycode[0] == 0x4F) {
-                if (input_col < 128) {
-                    fbputchar(input_buffer[(input_row - 43) * 132 + (input_col - 2)], input_row, input_col);
+                fbputchar(input_buffer[(input_row - 43) * 132 + (input_col - 2)], input_row, input_col);
+                if (input_col < 132 && input_buffer[(input_row - 43) * 132 + (input_col - 2)] != '\0') {
                     input_col++; // Move right within the row
-                } else if (input_row == 43 && input_col >= 128) {
+                } else if (input_row < 44 && input_col == 132) {
                     // Move to the start of the next row if at the end of row 43
-                    input_row = 44;
+                    input_row++;
+                    input_col = 0; // Start at the beginning of the next row
                 }
                 draw_cursor(input_row, input_col, input_buffer);
             }
+
 
 
             
