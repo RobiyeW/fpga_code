@@ -261,8 +261,8 @@ void draw_cursor(int row, int col, char *input_buffer) {
 
     // Restore the previous character in the buffer
     if (prev_col >= 2) {
-        int buffer_index = (prev_row == 43) ? prev_col - 2 : prev_col - 2 + 127;
-        fbputchar(input_buffer[buffer_index] ? input_buffer[buffer_index] : ' ', prev_row, prev_col);
+        int buffer_index = (prev_row == 43) ? prev_col - 2 : prev_col - 2 + 128;
+        fbputchar(input_buffer[buffer_index] ? input_buffer[buffer_index] : ' ', row, prev_col);
     }
 
     // Move to row 44 when exceeding col 128 in row 43
