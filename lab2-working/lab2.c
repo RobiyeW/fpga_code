@@ -197,8 +197,6 @@ int main()
             }
 
 
-
-            
             if (packet.keycode[0] == 0x28) { // Enter key
                 input_buffer[input_col - 3] = '\0';  // ✅ Ensure cursor is removed before sending
                 send(sockfd, input_buffer, strlen(input_buffer), 0);
