@@ -43,7 +43,7 @@ char keycode_to_ascii(uint8_t keycode, uint8_t modifiers)
         'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', // 14-23
         'U', 'V', 'W', 'X', 'Y', 'Z', '!', '@', '#', '$', // 24-33
         '%', '^', '&', '*', '(', ')', '_', '+', '{', ' ', // 34-43
-        '|', '_', '+', '{', '}', '|', '?', ' '            // 44-50 (Space at 50)
+        ' ', '_', '+', '{', '}', '|', '?', ' '            // 44-50 (Space at 50)
     };
 
     // Check if the keycode is in the valid range (4-50)
@@ -155,7 +155,7 @@ int main()
                 input_buffer[input_col - 2] = '\0';   // Remove from buffer safely
             }
             
-            if ((packet.keycode[0] == 0x2B || packet.keycode[0] == 0x43) && input_col < 132)
+            if ((packet.keycode[0] == 0x2B || packet.keycode[0] == 0x43) && input_col < 128)
             { // Tab (0x43) - Moves cursor forward 4 spaces
                 for (int i = 0; i < 4; i++)
                 {
@@ -169,7 +169,7 @@ int main()
                 if (input_row == 44 && input_col == 0) {  
                     // Move from start of row 44 to end of row 43
                     input_row = 43;
-                    input_col = 128;
+                    input_col = 127;
                 } else if (input_row == 44 && input_col > 0) {  
                     // Move left within row 44
                     input_col--;
@@ -177,19 +177,24 @@ int main()
                     // Move left within row 43 (preventing backtracking past `> `)
                     input_col--;
                 }
+                else if (input_row == 43 && input_col > 127) {  
+                    // Move left within row 43 (preventing backtracking past `> `)
+                    input_row = 44;
+                    input_col = 0;
+                }
                 draw_cursor(input_row, input_col, input_buffer);
             }
 
             // Handle Right Arrow Key (0x4F)
             if (packet.keycode[0] == 0x4F) {  
-                if (input_row == 43 && input_col == 128) {  
+                if (input_row == 43 && input_col == 127) {  
                     // Move from end of row 43 to start of row 44
                     input_row = 44;
                     input_col = 0;
-                } else if (input_row == 43 && input_col < 128) {  
+                } else if (input_row == 43 && input_col < 127) {  
                     // Move right within row 43
                     input_col++;
-                } else if (input_row == 44 && input_col < 128) {  
+                } else if (input_row == 44 && input_col < 127) {  
                     // Move right within row 44
                     input_col++;
                 }
