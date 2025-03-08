@@ -177,6 +177,19 @@ int main()
                 input_col++;  // 🔹 Move right
                 draw_cursor(input_row+1, input_col, input_buffer);  // 🔹 Redraw cursor at new position
             }
+
+            if (packet.keycode[0] == 0x50 && input_col <= 2)
+            { // Left Arrow (0x50)
+                fbputchar(input_buffer[input_col - 2], input_row+1, input_col);  // 🔹 Restore original character
+                input_col--;  // 🔹 Move left
+                draw_cursor(input_row+1, input_col, input_buffer);  // 🔹 Redraw cursor at new position
+            }
+            if (packet.keycode[0] == 0x4F && input_col >= 128 && input_buffer[input_col - 2] != '\0')
+            { // Right Arrow (0x4F)
+                fbputchar(input_buffer[input_col - 2], input_row+1, input_col);  // 🔹 Restore original character
+                input_col++;  // 🔹 Move right
+                draw_cursor(input_row+1, input_col, input_buffer);  // 🔹 Redraw cursor at new position
+            }
             
             if (packet.keycode[0] == 0x28) { // Enter key
                 input_buffer[input_col - 3] = '\0';  // ✅ Ensure cursor is removed before sending
