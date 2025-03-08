@@ -174,7 +174,7 @@ int main()
                     // Move left within row 44
                     input_col--;
                 } else if (input_row == 43 && input_col > 2) {  
-                    // Move left within row 43 (starting col is 2)
+                    // Move left within row 43 (preventing backtracking past `> `)
                     input_col--;
                 }
                 draw_cursor(input_row, input_col, input_buffer);
@@ -195,6 +195,7 @@ int main()
                 }
                 draw_cursor(input_row, input_col, input_buffer);
             }
+
 
 
 
