@@ -170,7 +170,7 @@ int main()
                 if (input_row == 44 && input_col == 0) {  
                     // Move from start of row 44 to end of row 43
                     input_row = 43;
-                    input_col = 127;
+                    input_col = 126;
                 } else if (input_row == 44 && input_col > 0) {  
                     // Move left within row 44
                     input_col--;
