@@ -259,31 +259,36 @@ void scroll_text_up() {
 void draw_cursor(int row, int col, char *input_buffer) {
     static int prev_row = 43, prev_col = 2;
 
-    // Restore previous character instead of drawing cursor in the buffer
+    // Restore the previous character in the buffer
     if (prev_col >= 2) {
-        int buffer_index = (prev_row == 43) ? prev_col - 2 : prev_col - 2 + 128;
+        int buffer_index = (prev_row == 43) ? prev_col - 2 : prev_col - 2 + 127;
         fbputchar(input_buffer[buffer_index] ? input_buffer[buffer_index] : ' ', prev_row, prev_col);
     }
 
-    // Handle cursor movement to row 44 when exceeding col 131
-    if (col >= 128 && row == 43) {
+    // Move to row 44 when exceeding col 128 in row 43
+    if (row == 43 && col > 128) {
         row = 44;
         col = 0;
     }
 
-    // Handle cursor movement back to row 43 when moving left past col 0 in row 44
-    if (col < 0 && row == 44) {
+    // Move to row 43 when moving left past col 0 in row 44
+    if (row == 44 && col < 0) {
         row = 43;
         col = 128;
     }
 
-    // Draw cursor at the correct position
+    // Keep cursor within row limits
+    if (row == 43 && col < 2) col = 2;  // Prevent moving before the `> ` prompt
+    if (row == 44 && col > 128) col = 128;  // Prevent exceeding max col in row 44
+
+    // Draw cursor at the new position
     fbputchar('_', row, col);
 
-    // Update previous position
+    // Update previous cursor position
     prev_row = row;
     prev_col = col;
 }
+
 
 
 

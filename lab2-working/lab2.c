@@ -174,7 +174,7 @@ int main()
                     // Move left within row 44
                     input_col--;
                 } else if (input_row == 43 && input_col > 2) {  
-                    // Move left within row 43 (starting col is 2)
+                    // Move left within row 43 (preventing backtracking past `> `)
                     input_col--;
                 }
                 draw_cursor(input_row, input_col, input_buffer);
@@ -197,6 +197,12 @@ int main()
             }
 
 
+<<<<<<< HEAD
+=======
+
+
+            
+>>>>>>> 4469a7a827da22797bd8a4592fb5a3b6502f189f
             if (packet.keycode[0] == 0x28) { // Enter key
                 input_buffer[input_col - 3] = '\0';  // ✅ Ensure cursor is removed before sending
                 send(sockfd, input_buffer, strlen(input_buffer), 0);
