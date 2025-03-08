@@ -143,10 +143,10 @@ int main()
             if (c && input_col - 2 >= BUFFER_SIZE - 1)
             { // 🔹 Ensure character is stored BEFORE moving cursor
                 input_buffer[input_col - 2] = c;  
-                fbputchar(c, input_row+1, input_col);
+                fbputchar(c, input_row+2, input_col);
                 input_col++;
                 printf("%s\n", input_buffer);
-                draw_cursor(input_row+1, input_col, input_buffer);  // 🔹 Update cursor immediately
+                draw_cursor(input_row+2, input_col, input_buffer);  // 🔹 Update cursor immediately
             }
 
             if ((packet.keycode[0] == 0x2A || packet.keycode[0] == 0x42) && input_col > 2)
